@@ -1,7 +1,5 @@
 //import MyScene from './my-scene'
 
-import * as Babylon from 'babylonjs';
-import { Mesh } from 'babylonjs';
 import Logger, {PopupType} from '../logger/Logger'
 import { Game } from './Game';
 import { GameObject } from './GameObject';
@@ -12,6 +10,7 @@ import { RawResourceManager } from '../resource/RawResourceManager';
 import { RawPath } from '../resource/RawPath';
 import { DRSprite } from '../resource/resources/DRSprite';
 import { ResourceManager } from '../resource/ResourceManager';
+import { DRScene } from '../resource/resources/DRScene';
 
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -44,28 +43,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-function testCreateScene(game : Game) : Babylon.Scene {
-    let scene = new Babylon.Scene(game.getBabylon());
-
-    // Create a FreeCamera, and set its position to (x:0, y:5, z:-10).
-    let camera = new Babylon.FreeCamera('camera1', new Babylon.Vector3(0, 5,-10), scene);
-
-    // Target the camera to scene origin.
-    camera.setTarget(Babylon.Vector3.Zero());
-
-    // Attach the camera to the canvas.
-    camera.attachControl(game.getCanvas(), true);
-
-    // Create a basic light, aiming 0,1,0 - meaning, to the sky.
-    new Babylon.HemisphericLight('light1', new Babylon.Vector3(0,1,0), scene);
-
-
-    // Create a built-in "ground" shape.
-    Babylon.MeshBuilder.CreateGround('ground1',
-                            {width: 6, height: 6, subdivisions: 2}, scene);
+function testCreateScene(game : Game) : DRScene {
+    let scene : DRScene = new DRScene("whatever");
 
     let sprite : DRSprite = game.getResourceManager().loadResource(game.getStorageManager(), DRSprite, "Sprites/icon.sprite");
-    new Billboard(10, 10, sprite).instantiate(game, scene);
+    scene.addObject(new Billboard(10, 10, sprite));
 
     return scene;
 }

@@ -1,5 +1,4 @@
-import * as Babylon from "babylonjs"
-import { Mesh } from "babylonjs";
+import * as BABYLON from 'babylonjs'
 import { autoserializeAs } from "cerialize";
 import Logger from "../../logger/Logger";
 import { DRSprite } from "../../resource/resources/DRSprite";
@@ -8,7 +7,7 @@ import { Game } from "../Game";
 import { GameObject, GameObjectCarrier } from "../GameObject";
 
 export class Billboard extends GameObject {
-    
+
     @autoserializeAs('standStraight') private _standStraight : boolean = true;
 
     @autoserializeAs('width') private _width : number;
@@ -16,7 +15,7 @@ export class Billboard extends GameObject {
 
     @autoserializeAs(new ResourceSerializer(DRSprite), 'sprite') private _sprite : DRSprite;
 
-    private _plane : Mesh;
+    private _plane : BABYLON.Mesh;
 
     constructor(width : number, height : number, sprite : DRSprite, standStraight : boolean = true) {
         super();
@@ -26,13 +25,13 @@ export class Billboard extends GameObject {
         this._standStraight = standStraight;
     }
 
-    onInstantiate(game: Game, scene: Babylon.Scene, root: GameObjectCarrier): void {
-        this._plane = Babylon.MeshBuilder.CreatePlane("Billboard", {width: this._width, height: this._height}, scene);
+    onInstantiate(game: Game, scene: BABYLON.Scene, root: GameObjectCarrier): void {
+        this._plane = BABYLON.MeshBuilder.CreatePlane("Billboard", {width: this._width, height: this._height}, scene);
         this._plane.setParent(root);
          if (this._sprite != null) {
-            let material = new Babylon.StandardMaterial("myMaterial", scene);
+            let material = new BABYLON.StandardMaterial("myMaterial", scene);
             let imgUrl = this._sprite.getBase64SpriteUrl(game.getStorageManager());
-            material.diffuseTexture = new Babylon.Texture(imgUrl, scene);
+            material.diffuseTexture = new BABYLON.Texture(imgUrl, scene);
             this._plane.material = material;
         }
     }

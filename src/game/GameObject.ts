@@ -1,19 +1,17 @@
-
-import * as Babylon from "babylonjs";
-import { TransformNode } from "babylonjs";
+import * as BABYLON from 'babylonjs'
 import { Game } from "./Game";
 
 // Pure data, our gameobject.
 export abstract class GameObject {
 
-    public instantiate(game : Game, scene : Babylon.Scene) : void {
+    public instantiate(game : Game, scene : BABYLON.Scene) : void {
         let carrier = new GameObjectCarrier("Carrier", scene, this);
         this.onInstantiate(game, scene, carrier);
     }
 
-    abstract onInstantiate(game : Game, scene : Babylon.Scene, root : GameObjectCarrier) : void;
+    abstract onInstantiate(game : Game, scene : BABYLON.Scene, root : GameObjectCarrier) : void;
 
-    abstract tick(game : Game, dt : Babylon.float) : void;
+    abstract tick(game : Game, dt : number) : void;
 
     abstract onRootDisposed() : void;
 }
@@ -24,16 +22,16 @@ export abstract class GameObject {
  * Effectively "piggy backs" off of babylon's scene system
  * so we don't have to write our own haha
  */
-export class GameObjectCarrier extends TransformNode {
+export class GameObjectCarrier extends BABYLON.TransformNode {
 
     private _gameObject : GameObject;
 
-    constructor(name : string, scene : Babylon.Scene, gameObject : GameObject) {
+    constructor(name : string, scene : BABYLON.Scene, gameObject : GameObject) {
         super(name, scene);
         this._gameObject = gameObject;
     }
 
-    tick(game : Game, dt : Babylon.float) : void {
+    tick(game : Game, dt : number) : void {
         this._gameObject.tick(game, dt);
     }
 

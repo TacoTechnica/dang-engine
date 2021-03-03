@@ -37,8 +37,6 @@ export class ProjectStorageManager {
                     }
                     needToFinish--;
                     if (needToFinish == 0) {
-                        Logger.logMessage("TREE:");
-                        Logger.logMessage(this._directoryMap);
                         this._currentProjectZip = file;
                         this._somethingDirty = false;
                         onfinish(true, "");

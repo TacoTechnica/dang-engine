@@ -8,6 +8,7 @@ import { GameObject } from './GameObject';
 import { Billboard } from './objects/Billboard';
 import {DropZone} from '../resource/DropZone';
 import { ProjectStorageManager } from '../resource/ProjectStorageManager';
+import { Project } from '../resource/Project';
 
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -27,31 +28,14 @@ window.addEventListener('DOMContentLoaded', () => {
             if (success) {
                 dropzone.destroy();
 
-                function tempPrintIndent(thing : string, depth : number) {
-                    let result : string = ">>";
-                    for (let i = 0; i < depth; ++i) result += "    ";
-                    result += thing;
-                    Logger.logDebug(result);
-                }
-                // Recursive test
-                function temp(path : string = "", depth : number = 0) {
-                    if (depth > 10) return;
-                    projectManager.getFilePathsInDirectory(path).forEach(sub => {
-                        tempPrintIndent(sub, depth);
-                    });
-                    projectManager.getDirectoryPathsInDirectory(path).forEach(sub => {
-                        tempPrintIndent(sub + "/", depth);
-                        temp(sub, depth + 1);
-                    });
-                }
-                temp();
-
-                // Deletion, adding, etc. works.
-                //Logger.logDebug(projectManager.writeFile("HELLO/oof.txt", btoa("This should be OK.")), " == ", false, " (false is what we want!)");
-                //projectManager.writeFile("test/test2/Hello.txt", btoa("Hi there!"), true);
-                //Logger.logDebug(atob(projectManager.readFile("/Scenes/Empty.scene")));
-                //projectManager.createDirectory("HELLO");
-                //projectManager.deleteItem("Scenes/Empty.scene");
+                // Test project loading/saving/creation/the whole shebang.
+                let p : Project = Project.load(projectManager, "project.json");
+                Logger.logMessage("before");
+                Logger.logMessage(p);
+                p.name = "This is a new name now!";
+                Logger.logMessage("after");
+                Logger.logMessage(p);
+                Project.save(projectManager, "project.json", p);
 
                 projectManager.saveZipFile();
 

@@ -10,7 +10,7 @@ import * as FileSaver from 'file-saver'
 /**
  * This loads + saves projects.
  */
-export class ProjectStorageManager {
+export class StorageManager {
 
     private _currentProjectZip : File;
     private _somethingDirty : boolean;
@@ -29,19 +29,32 @@ export class ProjectStorageManager {
         .then(zip => {
             this.clearStorage();
             let needToFinish : number = Object.keys(zip.files).length;
+            let base = this;
             // you now have every files contained in the loaded zip
             for(let key in zip.files) {
-                zip.files[key].async("base64").then(data => {
-                    if (!this.writeFile(key, data, true)) {
-                        Logger.logError("Failed to write file: ", key);
-                    }
-                    needToFinish--;
-                    if (needToFinish == 0) {
-                        this._currentProjectZip = file;
-                        this._somethingDirty = false;
-                        onfinish(true, "");
-                    }
-                });
+                let zippedFile : JSZip.JSZipObject = zip.files[key];
+                // Ignore directories
+                if (zippedFile.dir) {
+                    if (next()) break;
+                } else {
+                    zippedFile.async("base64").then(data => {
+                        if (!this.writeFile(key, data, true)) {
+                            Logger.logError("Failed to write file: ", key);
+                        }
+                        if (next()) return;
+                    });
+                }
+            }
+
+            function next() : boolean {
+                needToFinish--;
+                if (needToFinish == 0) {
+                    base._currentProjectZip = file;
+                    base._somethingDirty = false;
+                    onfinish(true, "");
+                    return true;
+                }
+                return false;
             }
         }).catch(error => {
             onfinish(false, error);
@@ -109,7 +122,7 @@ export class ProjectStorageManager {
         path = this.formatPath(path);
         // Recurse through, creating directories if we're instructed to do so.
         let currentDirNode = this._directoryMap;
-        let subpaths : string[] = ProjectStorageManager.splitSubpaths(path);
+        let subpaths : string[] = StorageManager.splitSubpaths(path);
         let failed = false;
         subpaths.forEach((sub, i) => {
             if (failed) return;
@@ -153,7 +166,7 @@ export class ProjectStorageManager {
     public createDirectory(path : string, recurseCreate : boolean = false) : boolean {
         path = this.formatPath(path);
         let currentDirNode = this._directoryMap;
-        let subpaths : string[] = ProjectStorageManager.splitSubpaths(path);
+        let subpaths : string[] = StorageManager.splitSubpaths(path);
         let failed = false;
         subpaths.forEach((sub, i) => {
             if (failed) return;
@@ -183,7 +196,7 @@ export class ProjectStorageManager {
 
     public deleteItem(path : string, recurseDelete : boolean = false) : boolean {
         path = this.formatPath(path);
-        let split : string[] = ProjectStorageManager.splitSubpaths(path);
+        let split : string[] = StorageManager.splitSubpaths(path);
         if (split.length == 0) {
             Logger.logError("Tried deleting root directory.");
             // We can't delete root directory
@@ -268,7 +281,7 @@ export class ProjectStorageManager {
 
     private getPathNode(path : string) {
         let currentDirNode = this._directoryMap;
-        let subpaths : string[] = ProjectStorageManager.splitSubpaths(path);
+        let subpaths : string[] = StorageManager.splitSubpaths(path);
         let failed = false;
         subpaths.forEach((sub) => {
             if (failed) return;

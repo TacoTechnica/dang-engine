@@ -7,8 +7,11 @@ import { Game } from './Game';
 import { GameObject } from './GameObject';
 import { Billboard } from './objects/Billboard';
 import {DropZone} from '../resource/DropZone';
-import { ProjectStorageManager } from '../resource/ProjectStorageManager';
-import { Project } from '../resource/Project';
+import { StorageManager } from '../resource/StorageManager';
+import { RawResourceManager } from '../resource/RawResourceManager';
+import { RawPath } from '../resource/RawPath';
+import { DRSprite } from '../resource/resources/DRSprite';
+import { ResourceManager } from '../resource/ResourceManager';
 
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -19,25 +22,42 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // This can be used to load multiple projects,
     // but for now we will only load one.
-    let projectManager : ProjectStorageManager = new ProjectStorageManager();
+    let storageManager : StorageManager = new StorageManager();
+    let rawResourceManager : RawResourceManager = new RawResourceManager();
+    let resourceManager : ResourceManager = new ResourceManager();
 
 
     let dropzone = new DropZone("dropZone");
     dropzone.onfileopened = (file) => {
-        projectManager.tryLoadZipFile(file, (success, message) => {
+        storageManager.tryLoadZipFile(file, (success, message) => {
             if (success) {
                 dropzone.destroy();
 
-                // Test project loading/saving/creation/the whole shebang.
-                let p : Project = Project.load(projectManager, "project.json");
-                Logger.logMessage("before");
-                Logger.logMessage(p);
-                p.name = "This is a new name now!";
-                Logger.logMessage("after");
-                Logger.logMessage(p);
-                Project.save(projectManager, "project.json", p);
+                // TEST: Create + Load sprite resource, assuming raw png file is in .raw/
 
-                projectManager.saveZipFile();
+                let testSpritePath = "Sprites/boof.sprite";
+
+                if (resourceManager.resourceExists(storageManager, testSpritePath)) {
+                    // Load the sprite resource that was added
+                    let testSprite : DRSprite = resourceManager.loadResource(storageManager, DRSprite, testSpritePath);
+
+                    Logger.logMessage("GOT: (finally)");
+                    Logger.logMessage(testSprite);
+
+                    let raw = testSprite.getResPath().readRawBase64(storageManager);
+
+                    var image = new Image();
+                    image.src = 'data:image/png;base64,' + raw;
+                    document.body.appendChild(image);    
+                    Logger.logMessage("LOADED SPRITE!");
+                } else {
+                    // Make new sprite resource from an imported raw resource
+                    let testSprite : DRSprite = new DRSprite(new RawPath(".raw/icon.png"));
+                    resourceManager.saveResource(storageManager, testSpritePath, testSprite);
+                    Logger.logMessage("NEW SPRITE!");
+                }
+
+                storageManager.saveZipFile();
 
             } else {
                 Logger.popup(message, PopupType.Warning);

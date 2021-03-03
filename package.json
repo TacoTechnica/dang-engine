@@ -21,13 +21,16 @@
   },
   "dependencies": {
     "@types/file-saver": "^2.0.1",
+    "@types/jquery": "^3.5.5",
     "@types/jszip": "^3.4.1",
     "babylonjs": "^4.1.0",
     "babylonjs-gui": "^4.1.0",
     "babylonjs-loaders": "^4.1.0",
     "babylonjs-materials": "^4.1.0",
+    "cerialize": "^0.1.18",
     "dropzone": "^5.7.6",
     "file-saver": "^2.0.5",
+    "jquery": "^3.6.0",
     "jszip": "^3.6.0",
     "webpack-merge": "^4.2.2"
   }

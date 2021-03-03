@@ -9,4 +9,15 @@
  */
 export abstract class Resource {
 
+    private _path : string;
+
+    constructor(path : string) {
+        this._path = path;
+    }
+
+    public setPathOnLoad(path : string) : void {
+        this._path = path;
+    }
+
+    public getPath() : string {return this._path;}
 }

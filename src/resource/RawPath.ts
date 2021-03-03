@@ -18,7 +18,7 @@ export class RawPath {
     }
 
 
-    public readRawBase64(this, storageManager : StorageManager) : string {
+    public readRawBase64(storageManager : StorageManager) : string {
         if (this.path.startsWith(".raw/")) {
             return storageManager.readFile(this.path);
         }

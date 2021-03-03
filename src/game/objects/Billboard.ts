@@ -1,23 +1,45 @@
 import * as Babylon from "babylonjs"
 import { Mesh } from "babylonjs";
+import { autoserializeAs } from "cerialize";
+import Logger from "../../logger/Logger";
+import { DRSprite } from "../../resource/resources/DRSprite";
+import { ResourceSerializer } from "../../resource/ResourceSerializer";
 import { Game } from "../Game";
-import { GameObject } from "../GameObject";
+import { GameObject, GameObjectCarrier } from "../GameObject";
 
 export class Billboard extends GameObject {
+    
+    @autoserializeAs('standStraight') private _standStraight : boolean = true;
 
-    private _standStraight : boolean = true;
+    @autoserializeAs('width') private _width : number;
+    @autoserializeAs('height') private _height : number;
+
+    @autoserializeAs(new ResourceSerializer(DRSprite), 'sprite') private _sprite : DRSprite;
+
     private _plane : Mesh;
 
-    constructor(scene : Babylon.Scene, width : number, height : number, imagePath : string = null, standStraight : boolean = true) {
-        super("Billboard", scene);
-        this._plane = Babylon.MeshBuilder.CreatePlane("Billboard", {width: width, height: height}, scene);
-        this._plane.setParent(this);
-         if (imagePath != null) {
+    constructor(width : number, height : number, sprite : DRSprite, standStraight : boolean = true) {
+        super();
+        this._width = width;
+        this._height = height;
+        this._sprite = sprite;
+        this._standStraight = standStraight;
+    }
+
+    onInstantiate(game: Game, scene: Babylon.Scene, root: GameObjectCarrier): void {
+        this._plane = Babylon.MeshBuilder.CreatePlane("Billboard", {width: this._width, height: this._height}, scene);
+        this._plane.setParent(root);
+         if (this._sprite != null) {
             let material = new Babylon.StandardMaterial("myMaterial", scene);
-            material.diffuseTexture = new Babylon.Texture(imagePath, scene);
+            let imgUrl = this._sprite.getBase64SpriteUrl(game.getStorageManager());
+            material.diffuseTexture = new Babylon.Texture(imgUrl, scene);
             this._plane.material = material;
         }
     }
+
+    onRootDisposed(): void {
+    }
+
 
     tick(game: Game, dt: number): void {
         // Do nothing

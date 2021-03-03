@@ -17,15 +17,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     Logger.init("alerts");
 
-    // Create the game using the 'renderCanvas'.
-    let game = new Game('view');
-
     // This can be used to load multiple projects,
     // but for now we will only load one.
     let storageManager : StorageManager = new StorageManager();
-    let rawResourceManager : RawResourceManager = new RawResourceManager();
-    let resourceManager : ResourceManager = new ResourceManager();
 
+    // Create the game using the 'renderCanvas'.
+    let game = new Game('view', storageManager);
 
     let dropzone = new DropZone("dropZone");
     dropzone.onfileopened = (file) => {
@@ -33,59 +30,19 @@ window.addEventListener('DOMContentLoaded', () => {
             if (success) {
                 dropzone.destroy();
 
+                game.loadScene(testCreateScene(game));
+                game.run();
                 // TEST: Create + Load sprite resource, assuming raw png file is in .raw/
-
-                let testSpritePath = "Sprites/boof.sprite";
-
-                if (resourceManager.resourceExists(storageManager, testSpritePath)) {
-                    // Load the sprite resource that was added
-                    let testSprite : DRSprite = resourceManager.loadResource(storageManager, DRSprite, testSpritePath);
-
-                    Logger.logMessage("GOT: (finally)");
-                    Logger.logMessage(testSprite);
-
-                    let raw = testSprite.getResPath().readRawBase64(storageManager);
-
-                    var image = new Image();
-                    image.src = 'data:image/png;base64,' + raw;
-                    document.body.appendChild(image);    
-                    Logger.logMessage("LOADED SPRITE!");
-                } else {
-                    // Make new sprite resource from an imported raw resource
-                    let testSprite : DRSprite = new DRSprite(new RawPath(".raw/icon.png"));
-                    resourceManager.saveResource(storageManager, testSpritePath, testSprite);
-                    Logger.logMessage("NEW SPRITE!");
-                }
-
-                storageManager.saveZipFile();
 
             } else {
                 Logger.popup(message, PopupType.Warning);
             }
-
         });
     };
 
 });
 
 
-class TestObject extends GameObject {
-
-    private _sphere : Mesh;
-
-    constructor(scene : Babylon.Scene) {
-        super("Test", scene);
-        this._sphere = Babylon.MeshBuilder.CreateSphere('sphere1',
-                            {segments: 16, diameter: 2}, scene);
-        this._sphere.setParent(this);
-        // Move the sphere upward 1/2 of its height.
-        this._sphere.position.y = 1;
-
-    }
-    tick(game: Game, dt: number): void {
-        this._sphere.position = this._sphere.position.add(Babylon.Vector3.Right().scale(dt));
-    }
-}
 
 function testCreateScene(game : Game) : Babylon.Scene {
     let scene = new Babylon.Scene(game.getBabylon());
@@ -107,8 +64,8 @@ function testCreateScene(game : Game) : Babylon.Scene {
     Babylon.MeshBuilder.CreateGround('ground1',
                             {width: 6, height: 6, subdivisions: 2}, scene);
 
-    new TestObject(scene);
-    new Billboard(scene, 10, 10, "file:///G:/Pictures/b o i.PNG");
+    let sprite : DRSprite = game.getResourceManager().loadResource(game.getStorageManager(), DRSprite, "Sprites/icon.sprite");
+    new Billboard(10, 10, sprite).instantiate(game, scene);
 
     return scene;
 }

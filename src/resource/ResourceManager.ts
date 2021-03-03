@@ -14,6 +14,15 @@ export class ResourceManager {
 
     private _resourceCache = {};
 
+    // Only in rare cases, mainly deserialization is this necessary
+    public static current : ResourceManager = null;
+
+    constructor() {
+        // Singleton patter, avoid as much as possible.
+        // It's unavoidable for custom serialization though, as that is static.
+        ResourceManager.current = this;
+    }
+
     public clear() {
         this._resourceCache = {};
     }
@@ -78,6 +87,7 @@ export class ResourceManager {
         if (storageManager.fileExists(path)) {
             let data = atob(storageManager.readFile(path));
             let result = JsonHelper.deserialize(type, data);
+            result.setPathOnLoad(path);
             return result;
         }
         return null;

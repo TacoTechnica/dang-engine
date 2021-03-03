@@ -1,8 +1,8 @@
 import { inheritSerialization, autoserializeAs } from "cerialize";
 import { Vector2 } from "babylonjs";
 import { RawPath } from "../RawPath";
-import { Resource } from "../Resource";
 import { ResourceWithRaw } from "../ResourceWithRaw";
+import { StorageManager } from "../StorageManager";
 
 @inheritSerialization(ResourceWithRaw)
 export class DRSprite extends ResourceWithRaw {
@@ -10,13 +10,15 @@ export class DRSprite extends ResourceWithRaw {
     @autoserializeAs("pivot")
     private _pivot : Vector2 = Vector2.Zero();
 
-    constructor(resPath : RawPath = null) {
-        super(resPath);
+    constructor(path : string, resPath : RawPath = null) {
+        super(path, resPath);
     }
 
     public getPivot() {return this._pivot;}
-}
-function autoSerializeAs(arg0: string) {
-    throw new Error("Function not implemented.");
+
+    public getBase64SpriteUrl(storageManager : StorageManager) {
+        return 'data:image/png;base64,' + this.getRawBase64(storageManager);
+    }
+
 }
 

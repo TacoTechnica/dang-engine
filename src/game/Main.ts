@@ -1,6 +1,7 @@
 //import MyScene from './my-scene'
 
-import Logger, {PopupType} from '../logger/Logger'
+import * as BABYLON from 'babylonjs';
+import Logger, {PopupType} from '../logger/Logger';
 import { Game } from './Game';
 import { GameObject } from './GameObject';
 import { Billboard } from './objects/Billboard';
@@ -47,7 +48,9 @@ function testCreateScene(game : Game) : DRScene {
     let scene : DRScene = new DRScene("whatever");
 
     let sprite : DRSprite = game.getResourceManager().loadResource(game.getStorageManager(), DRSprite, "Sprites/icon.sprite");
-    scene.addObject(new Billboard(10, 10, sprite));
+    let sprit2 : DRSprite = game.getResourceManager().loadResource(game.getStorageManager(), DRSprite, "Sprites/aa.sprite");
+    scene.addObject(new Billboard(new BABYLON.Vector3(0, 0, 0), 10, 10, sprite));
+    scene.addObject(new Billboard(new BABYLON.Vector3(10, -1, 1), 5, 10, sprit2));
 
     return scene;
 }

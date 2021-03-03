@@ -1,6 +1,6 @@
 
 
-class ButtonState<T> {
+class ButtonState<T extends any> {
     private _keys : any = {};
 
     public isDown(key : T) : boolean {

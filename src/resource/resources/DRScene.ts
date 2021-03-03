@@ -1,5 +1,6 @@
 
 import * as BABYLON from 'babylonjs'
+import { inheritSerialization, serializeAs } from 'cerialize';
 import { Game } from "../../game/Game";
 import { GameObject } from "../../game/GameObject";
 import { Resource } from "../Resource";
@@ -9,10 +10,11 @@ import { Resource } from "../Resource";
  * 
  * Includes a list of gameobjects and other properties we may care about.
  */
+@inheritSerialization(Resource)
 export class DRScene extends Resource {
 
-    private _gameObjects : GameObject[] = [];
-    private _backgroundColor : BABYLON.Color3 = BABYLON.Color3.Black();
+    @serializeAs(GameObject, "gameObjects") private _gameObjects : GameObject[] = [];
+    @serializeAs(BABYLON.Color3, "backgroundColor") private _backgroundColor : BABYLON.Color3 = BABYLON.Color3.Black();
 
     public getGameObjects() : GameObject[] {
         return this._gameObjects;

@@ -1,12 +1,23 @@
 import * as BABYLON from 'babylonjs'
+import { serializeAs } from 'cerialize';
 import { Game } from "./Game";
 
 // Pure data, our gameobject.
 export abstract class GameObject {
 
+    @serializeAs(BABYLON.Vector3, "position")
+    private _startPosition : BABYLON.Vector3;
+
+    private _carrier : GameObjectCarrier;
+
+    constructor(position : BABYLON.Vector3) {
+        this._startPosition = position;
+    }
+
     public instantiate(game : Game, scene : BABYLON.Scene) : void {
-        let carrier = new GameObjectCarrier("Carrier", scene, this);
-        this.onInstantiate(game, scene, carrier);
+        this._carrier = new GameObjectCarrier("Carrier", scene, this);
+        this.onInstantiate(game, scene, this._carrier);
+        this._carrier.position = this._startPosition;
     }
 
     abstract onInstantiate(game : Game, scene : BABYLON.Scene, root : GameObjectCarrier) : void;
@@ -14,6 +25,9 @@ export abstract class GameObject {
     abstract tick(game : Game, dt : number) : void;
 
     abstract onRootDisposed() : void;
+
+    public getPosition() : BABYLON.Vector3 {return this._carrier.position;}
+    public setPosition(position : BABYLON.Vector3) : void {this._carrier.position = position;}
 }
 
 /**

@@ -39,27 +39,20 @@ export class Game {
     public getStorageManager() : StorageManager {return this._storageManager;}
     public getResourceManager() : ResourceManager {return this._resourceManager;}
 
-    public loadProject(file : File, onSuccess : () => void, onFail : (message) => void) : void {
-        this._storageManager.tryLoadZipFile(file, (success, message) => {
-            if (success) {
-                let projectPath = "project.json";
-                if (this._resourceManager.projectFileExists(this._storageManager)) {
-                    let project : ProjectInfo = this._resourceManager.loadProjectFile(this._storageManager);
-                    let startScene : DRScene = project.getStartScene();
-                    if (startScene != null) {
-                        this._currentProjectInfo = project;
-                        onSuccess();
-                    } else {
-                        onFail("A start scene was not defined in " + projectPath + ", this is required.");
-                    }
-                } else {
-                    onFail("No " + projectPath + " file found in your project's root directory. Thus, no project was found.");
-                }
+    public openProject(onSuccess : () => void, onFail : (message) => void) : void {
+        let projectPath = "project.json";
+        if (this._resourceManager.projectFileExists(this._storageManager)) {
+            let project : ProjectInfo = this._resourceManager.loadProjectFile(this._storageManager);
+            let startScene : DRScene = project.getStartScene();
+            if (startScene != null) {
+                this._currentProjectInfo = project;
+                onSuccess();
             } else {
-                onFail(message);
+                onFail("A start scene was not defined in " + projectPath + ", this is required.");
             }
-        });
-
+        } else {
+            onFail("No " + projectPath + " file found in your project's root directory. Thus, no project was found.");
+        }
     }
 
     public loadScene(scene : DRScene) : void {

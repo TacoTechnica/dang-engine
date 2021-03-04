@@ -19,35 +19,57 @@ window.addEventListener('DOMContentLoaded', () => {
     let storageManager : StorageManager = new StorageManager();
     let resourceManager : ResourceManager = new ResourceManager();
 
+    let fileSystemExists = storageManager.tryLoadPresentDirectories();
+
     // Create the game using the 'renderCanvas'.
     let game = new Game('view', storageManager, resourceManager);
 
-    let needsToLoadNew = true;
+    let canReloadOldProject = false;
 
-    /* In progress, we need some more indexing.
-    if (resourceManager.projectFileExists(storageManager)) {
-        needsToLoadNew = false;
+    // If a file system is already loaded and a project file exists, we can try reloading an old project.
+    if (fileSystemExists && resourceManager.projectFileExists(storageManager)) {
+        canReloadOldProject = true;
     }
-    */
 
-    if (needsToLoadNew) {
-        // User will load a project from here.
-        let dropzone = new DropZone("dropZone");
+    // The user might not want to reload an old project though, so give them a prompt.
+    // This should be replaced with something cooler but this is fine for now.
+    if (canReloadOldProject) {
+        if (!confirm("Project previously loaded, use already loaded project?")) {
+            canReloadOldProject = false;
+        }
+    }
+
+    if (canReloadOldProject) {
+        // Project is already loaded in storage, so have the game load it.
+        game.openProject(
+            () => {
+                game.run();
+            },
+            (failMessage) => {
+                // Something failed, we'll have to reload.
+                Logger.popup(failMessage, PopupType.Warning);
+            }
+        );
+    } else {
+        // Have the user pick a project to load.
+        let dropzone = new DropZone("Drag+Drop Project here");
 
         dropzone.onfileopened = (file) => {
-            game.loadProject(file,
-                () => {
-                    dropzone.destroy();
-                    game.run();
-                },
-                (failMessage) => {
-                    Logger.popup(failMessage, PopupType.Warning);
+            storageManager.tryLoadZipFile(file, (success, error) => {
+                if (success) {
+                    game.openProject(
+                        () => {
+                            dropzone.destroy();
+                            game.run();
+                        },
+                        (failMessage) => {
+                            Logger.popup(failMessage, PopupType.Warning);
+                        }
+                    );
+                } else {
+                    Logger.popup(error, PopupType.Warning);
                 }
-            );
+            })
         };
-    } else {
-        // Project is already loaded. Run away!
-        game.run();
     }
-
 });

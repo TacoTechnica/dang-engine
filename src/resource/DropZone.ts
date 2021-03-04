@@ -5,8 +5,12 @@ export class DropZone {
 
     public onfileopened : (file : File) => void = (file) => {};
 
-    constructor(elementName : string) {
-        this._element = document.getElementById("dropZone");
+    constructor(text : string) {
+
+        this._element = document.createElement("button");
+        this._element.id = "dropZone";
+        this._element.innerHTML = text;
+        document.body.appendChild(this._element);
 
         this._element.onclick = (mevent) => {
             if (mevent.button == 0) {

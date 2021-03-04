@@ -12,11 +12,13 @@ import * as FileSaver from 'file-saver'
  */
 export class StorageManager {
 
+    private static DIRECTORY_MAP_FILE_NAME = "__DIRECTORIES__";
+
     private _currentProjectZip : File;
     private _somethingDirty : boolean;
 
     // Hopefully disk storage, stores ALL DATA in an UNCOMPRESSED format.
-    private _storage : Storage = sessionStorage;
+    private _storage : Storage = localStorage;
 
     // In memory, bookkeeping that's only used by the editor.
     private _directoryMap = {};
@@ -24,7 +26,6 @@ export class StorageManager {
     private _itemCounter : int = 0;
 
     public static current : StorageManager;
-
 
     public tryLoadZipFile(file : File, onfinish : (success : boolean, error : string) => void) : void {
         let jz : JSZip = new JSZip();
@@ -64,6 +65,18 @@ export class StorageManager {
         }).catch(error => {
             onfinish(false, error);
         });
+    }
+
+    public tryLoadPresentDirectories() : boolean {
+        let data = this._storage.getItem(StorageManager.DIRECTORY_MAP_FILE_NAME);
+        if (data == null) {
+            this._directoryMap = {};
+            return false;
+        } else {
+            this._directoryMap = JSON.parse(data);
+            StorageManager.current = this;
+            return true;
+        }
     }
 
     public saveZipFile(name : string = null) : void {
@@ -129,6 +142,7 @@ export class StorageManager {
         let currentDirNode = this._directoryMap;
         let subpaths : string[] = StorageManager.splitSubpaths(path);
         let failed = false;
+        let directoryTreeModified = false;
         subpaths.forEach((sub, i) => {
             if (failed) return;
             let last = (i == subpaths.length - 1);
@@ -138,11 +152,12 @@ export class StorageManager {
                     let newKey = this.getNewStorageKey();
                     //Logger.logDebug("### ", sub, " = ", newKey);
                     currentDirNode[sub] = newKey;
+                    directoryTreeModified = true;
                 } else {
                     // We're a directory part
                     if (recurseDirectoryCreate) {
                         currentDirNode[sub] = {};
-                        //Logger.logDebug("### ", sub);
+                        directoryTreeModified = true;
                     } else {
                         failed = true;
                         return;
@@ -151,6 +166,11 @@ export class StorageManager {
             }
             currentDirNode = currentDirNode[sub];
         });
+
+        if (directoryTreeModified) {
+            this.updateDirectoryMapFile();
+        }
+
         if (failed) {
             return false;
         }
@@ -173,6 +193,7 @@ export class StorageManager {
         let currentDirNode = this._directoryMap;
         let subpaths : string[] = StorageManager.splitSubpaths(path);
         let failed = false;
+        let directoryTreeModified = false;
         subpaths.forEach((sub, i) => {
             if (failed) return;
             let last = (i == subpaths.length - 1);
@@ -184,10 +205,12 @@ export class StorageManager {
                     return;
                 }
                 currentDirNode[sub] = {};
+                directoryTreeModified = true;
             }
             if (!exists) {
                 if (recurseCreate) {
                     currentDirNode[sub] = {};
+                    directoryTreeModified = true;
                 } else {
                     failed = true;
                     return;
@@ -195,6 +218,10 @@ export class StorageManager {
             }
             currentDirNode = currentDirNode[sub];
         });
+
+        if (directoryTreeModified) {
+            this.updateDirectoryMapFile();
+        }
 
         return !failed;
     }
@@ -208,6 +235,7 @@ export class StorageManager {
             return false;
         }
 
+        let directoryTreeModified = false;
         // Delete sub directories?
         if (this.directoryExists(path)) {
             if (this.getPathsInDirectory(path).length != 0 && !recurseDelete) {
@@ -223,6 +251,7 @@ export class StorageManager {
                     failed = true;
                     return;
                 }
+                directoryTreeModified = true;
             });
             if (failed) return false;
         } else {
@@ -231,6 +260,7 @@ export class StorageManager {
                 let key = this.getPathNode(path);
                 if (typeof(key) == 'string') {
                     this._storage.removeItem(key);
+                    directoryTreeModified = true;
                 } else {
                     Logger.logError("Tried deleting valid file at ", path, "but it's not a file node. This likely means a file heirarchy corruption occured.");
                     return false;
@@ -244,6 +274,13 @@ export class StorageManager {
             let prevNodeName = split.slice(0, split.length - 1).join('/');
             let prevNode = this.getPathNode(prevNodeName);
             delete prevNode[targetNodeName];
+        }
+
+        // TODO: 482 scenario: If our program happens to crash
+        // RIGHT before this step, our directory map will say
+        // we have a file that exists when it really doesn't.
+        if (directoryTreeModified) {
+            this.updateDirectoryMapFile();
         }
 
         return true;
@@ -300,7 +337,7 @@ export class StorageManager {
         return currentDirNode;
     }
 
-    private clearStorage() : void {
+    public clearStorage() : void {
         this._storage.clear();
         this._directoryMap = {};
     }
@@ -325,7 +362,14 @@ export class StorageManager {
 
     private getNewStorageKey() : string {
         this._itemCounter++;
+        // Juuuuuust in case.
+        while (this._itemCounter.toString() == StorageManager.DIRECTORY_MAP_FILE_NAME) {
+            this._itemCounter++;
+        }
         return this._itemCounter.toString();
     }
 
+    private updateDirectoryMapFile() : void {
+        this._storage.setItem(StorageManager.DIRECTORY_MAP_FILE_NAME, JSON.stringify(this._directoryMap));
+    }
 }

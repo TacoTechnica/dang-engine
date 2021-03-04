@@ -39,7 +39,7 @@ export class ResourceManager {
         return this._resourceCache[path].data;
     }
 
-    public saveResource<T>(storageManager : StorageManager, path : string, resource : T) : boolean {
+    public saveResource<T>(storageManager : StorageManager, resource : T, path : string) : boolean {
         let jsonText = JsonHelper.serialize(resource);
         return storageManager.writeFile(path, btoa(jsonText));
     }

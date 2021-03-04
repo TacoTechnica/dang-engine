@@ -28,6 +28,7 @@ export class StorageManager {
 
     public tryLoadZipFile(file : File, onfinish : (success : boolean, error : string) => void) : void {
         let jz : JSZip = new JSZip();
+        let base = this;
         jz.loadAsync(file)
         .then(zip => {
             this.clearStorage();
@@ -54,7 +55,7 @@ export class StorageManager {
                 if (needToFinish == 0) {
                     base._currentProjectZip = file;
                     base._somethingDirty = false;
-                    StorageManager.current = this;
+                    StorageManager.current = base;
                     onfinish(true, "");
                     return true;
                 }

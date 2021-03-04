@@ -12,7 +12,6 @@ import { RawPath } from '../resource/RawPath';
 import { DRSprite } from '../resource/resources/DRSprite';
 import { ResourceManager } from '../resource/ResourceManager';
 import { DRScene } from '../resource/resources/DRScene';
-
 window.addEventListener('DOMContentLoaded', () => {
 
     Logger.init("alerts");
@@ -30,9 +29,26 @@ window.addEventListener('DOMContentLoaded', () => {
             if (success) {
                 dropzone.destroy();
 
-                game.loadScene(testCreateScene(game));
-                game.run();
-                // TEST: Create + Load sprite resource, assuming raw png file is in .raw/
+                let testPath = "Scenes/JS_TEST.scene";
+
+                if (game.getResourceManager().resourceExists(game.getStorageManager(), testPath)) {
+                    Logger.logMessage("FOUND SCENE!");
+                    let scene : DRScene = game.getResourceManager().loadResource(game.getStorageManager(), DRScene, testPath);
+                    Logger.logMessage(scene.getGameObjects());
+                    game.loadScene(scene);
+                    game.run();
+                } else {
+                    Logger.logMessage("No scene found at ", testPath, " saving.");
+                    let scene : DRScene = testCreateScene(game);
+                    /*
+                    Logger.logMessage("OOF:", JSON.stringify(scene));
+                    Logger.logMessage("OOF:", Serialize(scene));
+                    Logger.logMessage("OOF:", Serialize(scene, DRScene));
+                    */
+                    game.getResourceManager().saveResource(game.getStorageManager(), scene, testPath);
+                }
+                storageManager.saveZipFile();
+                
 
             } else {
                 Logger.popup(message, PopupType.Warning);

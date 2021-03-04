@@ -26,13 +26,17 @@ import Logger from "../logger/Logger";
 
 export class JsonHelper {
 
-    static serialize(object) : string {
-        return JSON.stringify(Serialize(object), null, 2);
+    static serialize(object : any, type?: Function | ISerializable) : string {
+        return JSON.stringify(Serialize(object, type), null, 2);
     }
 
     static deserialize<T>(type: Function | INewable<T> | ISerializable, jsonText : string) : T {
         let jsonObj = JSON.parse(jsonText);
-        let deserialized = Deserialize(jsonObj, type);
+        return this.deserializeObj(type, jsonObj);
+    }
+
+    static deserializeObj<T>(type : Function | INewable<T> | ISerializable, object : any) : T {
+        let deserialized = Deserialize(object, type);
         return deserialized;
     }
 

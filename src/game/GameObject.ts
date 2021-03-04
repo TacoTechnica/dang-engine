@@ -1,16 +1,20 @@
 import * as BABYLON from 'babylonjs'
-import { serializeAs } from 'cerialize';
+import { autoserializeAs, serializeAs } from 'cerialize';
 import { Game } from "./Game";
 
 // Pure data, our gameobject.
 export abstract class GameObject {
 
-    @serializeAs(BABYLON.Vector3, "position")
+    @autoserializeAs("@type")
+    private _type : string;
+
+    @autoserializeAs("position")
     private _startPosition : BABYLON.Vector3;
 
     private _carrier : GameObjectCarrier;
 
-    constructor(position : BABYLON.Vector3) {
+    constructor(type : string, position : BABYLON.Vector3) {
+        this._type = type;
         this._startPosition = position;
     }
 
@@ -28,6 +32,8 @@ export abstract class GameObject {
 
     public getPosition() : BABYLON.Vector3 {return this._carrier.position;}
     public setPosition(position : BABYLON.Vector3) : void {this._carrier.position = position;}
+
+    public getTypeKey() : string {return this._type;}
 }
 
 /**

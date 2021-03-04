@@ -39,8 +39,6 @@ function loadShaderText(path : string) : string {
 @inheritSerialization(GameObject)
 export class Billboard extends GameObject {
 
-    private static TYPE = GlobalGameObjectRegistry.register(Billboard, "Billboard");
-
     @autoserializeAs('standStraight') private _standStraight : boolean = true;
 
     @autoserializeAs('width') private _width : number;
@@ -53,7 +51,7 @@ export class Billboard extends GameObject {
     private _material : BABYLON.ShaderMaterial;
 
     constructor(position : BABYLON.Vector3, width : number, height : number, sprite : DRSprite, standStraight : boolean = true) {
-        super(Billboard.TYPE, position);
+        super(GlobalGameObjectRegistry.BILLBOARD, position);
         this._width = width;
         this._height = height;
         this._sprite = sprite;

@@ -1,4 +1,6 @@
 import { ISerializable } from "cerialize";
+import Logger from "../logger/Logger";
+import { Billboard } from "./objects/Billboard";
 
 
 /**
@@ -7,8 +9,17 @@ import { ISerializable } from "cerialize";
  * for serialization/deserialization.
  */
 export class GlobalGameObjectRegistry {
-
+    
+    // Data
     private static _map = {};
+
+    // Registry hard coded in.
+    // If you want though you can hard code this anywhere, make your own custom class that has custom
+    // gameobject types defined. So while I dislike this centralization, it's still open
+    // to modding in the future.
+
+    // REGISTRY ITEMS
+    public static BILLBOARD = GlobalGameObjectRegistry.register(Billboard, "Billboard");
 
     public static register(type : Function | ISerializable, name : string) {
         if (name in this._map) {

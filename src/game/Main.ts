@@ -1,5 +1,3 @@
-//import MyScene from './my-scene'
-
 
 import Logger, {PopupType} from '../logger/Logger';
 import { Game } from './Game';
@@ -8,6 +6,7 @@ import {DropZone} from '../resource/DropZone';
 import { StorageManager } from '../resource/StorageManager';
 
 import { ResourceManager } from '../resource/ResourceManager';
+import { Test } from './Tests';
 
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -23,6 +22,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Create the game using the 'renderCanvas'.
     let game = new Game('view', storageManager, resourceManager);
+
+    // Run any tests we may want to run, to prevent clutter in Main.
+    new Test().GLOBAL_TEST(game);
 
     let canReloadOldProject = false;
 

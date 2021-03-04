@@ -1,5 +1,7 @@
 import * as BABYLON from 'babylonjs'
 import { autoserializeAs, serializeAs } from 'cerialize';
+import { Coroutine } from './coroutines/Coroutine';
+import { CoroutineRunner } from './coroutines/CoroutineRunner';
 import { Game } from "./Game";
 
 // Pure data, our gameobject.
@@ -11,11 +13,15 @@ export abstract class GameObject {
     @autoserializeAs("position")
     private _startPosition : BABYLON.Vector3;
 
+    private _coroutineRunner : CoroutineRunner;
+
     private _carrier : GameObjectCarrier;
 
     constructor(type : string, position : BABYLON.Vector3) {
         this._type = type;
         this._startPosition = position;
+
+        this._coroutineRunner = new CoroutineRunner();
     }
 
     public instantiate(game : Game, scene : BABYLON.Scene) : void {
@@ -30,6 +36,18 @@ export abstract class GameObject {
 
     abstract onRootDisposed() : void;
 
+    // Coroutines
+    public startCoroutine(generator) : Coroutine {
+        return this._coroutineRunner.run(generator);
+    }
+    public stopCoroutine(coroutine : Coroutine) {
+        coroutine.stop();
+    }
+    public stopAllCoroutines() {
+        this._coroutineRunner.stopAll();
+    }
+
+    // Handling data
     public getPosition() : BABYLON.Vector3 {return this._carrier.position;}
     public setPosition(position : BABYLON.Vector3) : void {this._carrier.position = position;}
 

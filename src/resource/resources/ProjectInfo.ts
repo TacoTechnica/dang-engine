@@ -1,9 +1,9 @@
 import { autoserialize, autoserializeAs, inheritSerialization } from 'cerialize';
-import { DefaultResources } from './DefaultResources';
-import { Resource } from './Resource';
-import { DRScene } from './resources/DRScene';
-import { ResourceSerializer } from './ResourceSerializer';
-import { StorageManager } from "./StorageManager";
+import { DefaultResources } from '../DefaultResources';
+import { Resource } from '../Resource';
+import { DRScene } from './DRScene';
+import { ResourceSerializer } from '../ResourceSerializer';
+import { StorageManager } from "../StorageManager";
 
 
 @inheritSerialization(Resource)

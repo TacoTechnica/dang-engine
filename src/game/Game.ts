@@ -2,9 +2,9 @@ import * as BABYLON from 'babylonjs'
 import { DebugLayer } from 'babylonjs';
 import * as BABYLONGUI from 'babylonjs-gui'
 import { INewable, ISerializable } from 'cerialize';
-import Logger from '../logger/Logger';
+import Debug from '../debug/Debug';
 import { DefaultResources } from '../resource/DefaultResources';
-import { ProjectInfo } from '../resource/ProjectInfo';
+import { ProjectInfo } from '../resource/resources/ProjectInfo';
 import { Resource } from '../resource/Resource';
 import { ResourceManager } from '../resource/ResourceManager';
 import { DRScene } from '../resource/resources/DRScene';
@@ -42,7 +42,7 @@ export class Game {
 
         this._guiManager = new GUIManager();
 
-        Logger.logMessage("Game initialized");
+        Debug.logMessage("Game initialized");
     }
 
     public getBabylon() : BABYLON.Engine {return this._engine;}
@@ -52,7 +52,7 @@ export class Game {
 
     public getDefaultResources() : DefaultResources {
         if (this._currentProjectInfo.defaultResources == null) {
-            Logger.popup("Default resources not found in project.json, will generate an empty set of default resources.");
+            Debug.popup("Default resources not found in project.json, will generate an empty set of default resources.");
             this._currentProjectInfo.defaultResources = new DefaultResources();
         }
         return this._currentProjectInfo.defaultResources;
@@ -105,10 +105,10 @@ export class Game {
             if (startScene != null) {
                 this.loadScene(startScene);
             } else {
-                Logger.logWarning("No starting scene found.");
+                Debug.logWarning("No starting scene found.");
             }
         } else {
-            Logger.logWarning("No project info loaded.");
+            Debug.logWarning("No project info loaded.");
         }
 
         this._canvas.hidden = false;

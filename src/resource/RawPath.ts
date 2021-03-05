@@ -3,7 +3,7 @@
  * Represents a raw path that points to either a raw resource or a web URL
  */
 
-import Logger from "../logger/Logger";
+import Debug from "../debug/Debug";
 import { StorageManager } from "./StorageManager";
 
 import { autoserialize } from "cerialize";

@@ -1,5 +1,5 @@
 import { autoserialize, autoserializeAs, INewable, ISerializable } from "cerialize";
-import Logger from "../logger/Logger";
+import Debug from "../debug/Debug";
 import { JsonHelper } from "./JsonHelper";
 import { Resource } from "./Resource";
 import { ResourceManager } from "./ResourceManager";
@@ -39,7 +39,7 @@ export class DefaultResources {
 
     public loadDefaultResource<T extends Resource>(storageManager : StorageManager, resourceManager : ResourceManager, type: Function | INewable<T> | ISerializable, defaultURL : string, onLoad : (resource : T) => void) : void {
         if (defaultURL == null) {
-            Logger.logError("Tried loading resource but default URL was given as null, please use DefaultResource.<url name here> as the url!");
+            Debug.logError("Tried loading resource but default URL was given as null, please use DefaultResource.<url name here> as the url!");
             return;
         }
         if (defaultURL.startsWith(DEFAULT_URL_FOLDER + "/")) {

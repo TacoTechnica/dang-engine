@@ -1,5 +1,5 @@
 import { ISerializable } from "cerialize";
-import Logger from "../logger/Logger";
+import Debug from "../debug/Debug";
 import { Billboard } from "./objects/Billboard";
 
 

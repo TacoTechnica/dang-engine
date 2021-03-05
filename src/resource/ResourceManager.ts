@@ -4,9 +4,9 @@
  * Caches the resources so we don't have to reload them all the time.
  */
 import { INewable, ISerializable } from "cerialize";
-import Logger from "../logger/Logger";
+import Debug from "../debug/Debug";
 import { JsonHelper } from "./JsonHelper";
-import { ProjectInfo } from "./ProjectInfo";
+import { ProjectInfo } from "./resources/ProjectInfo";
 import { RawResourceManager } from "./RawResourceManager";
 import { Resource } from "./Resource";
 import { StorageManager } from "./StorageManager";

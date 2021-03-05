@@ -1,5 +1,5 @@
 
-import Logger from "../logger/Logger";
+import Debug from "../debug/Debug";
 import { JsonHelper } from "../resource/JsonHelper";
 import { GameObject } from "./GameObject";
 import { GlobalGameObjectRegistry } from "./GlobalGameObjectRegistry";
@@ -10,7 +10,7 @@ export class GameObjectsSerializer {
         if (GlobalGameObjectRegistry.keyMapped(key)) {
             return JsonHelper.serialize(gameObject, GlobalGameObjectRegistry.getTypeMapping(key));
         } else {
-            Logger.logError("Type ", key ," is not registered, found when serializing gameObject: ", gameObject, ". Most likely a programming mistake.");
+            Debug.logError("Type ", key ," is not registered, found when serializing gameObject: ", gameObject, ". Most likely a programming mistake.");
         }
         return JsonHelper.serialize(gameObject);
     }
@@ -24,10 +24,10 @@ export class GameObjectsSerializer {
                 if (GlobalGameObjectRegistry.keyMapped(key)) {
                     result.push(JsonHelper.deserializeObj(GlobalGameObjectRegistry.getTypeMapping(key), objectRaw));
                 } else {
-                    Logger.logError("Type ", key ," is not registered, found when deserializing data: ", data, ". Most likely the scene file you've loaded is not formatted properly.");
+                    Debug.logError("Type ", key ," is not registered, found when deserializing data: ", data, ". Most likely the scene file you've loaded is not formatted properly.");
                 }
             } else {
-                Logger.logError("@type key not found after deserializing gameObject with data: ", data, ". Most likely the scene file you've loaded is not formatted properly.");
+                Debug.logError("@type key not found after deserializing gameObject with data: ", data, ". Most likely the scene file you've loaded is not formatted properly.");
             }    
         });
         return result;

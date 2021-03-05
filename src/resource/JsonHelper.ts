@@ -3,7 +3,7 @@
 // TODO: Test for the following scenario:
 
 import { Deserialize, DeserializeInto, INewable, ISerializable, Serialize } from "cerialize";
-import Logger from "../logger/Logger";
+import Debug from "../debug/Debug";
 import * as $ from 'jquery';
 
 
@@ -59,7 +59,7 @@ export class JsonHelper {
             success : ((onSuccess != null) ? onSuccess : (data) => {}),
             error : function(XMLHttpRequest, textStatus, errorThrown) {
                 if (onError != null) onError(errorThrown);
-                else Logger.logError(errorThrown);
+                else Debug.logError(errorThrown);
             },
             xhrFields: {
                 withCredentials: true

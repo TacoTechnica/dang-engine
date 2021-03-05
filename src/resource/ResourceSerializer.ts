@@ -1,5 +1,5 @@
 import { INewable, ISerializable } from "cerialize";
-import Logger from "../logger/Logger";
+import Debug from "../debug/Debug";
 import { Resource } from "./Resource";
 import { ResourceManager } from "./ResourceManager";
 import { StorageManager } from "./StorageManager";
@@ -35,7 +35,7 @@ export class ResourceSerializer<T> {
     }
     public Deserialize(path : string) : any {
         if (!ResourceManager.current.resourceExists(StorageManager.current, path)) {
-            Logger.logError("Attempted to load resource at ", path, " but that resource does not exist! Things will break at least a little.");
+            Debug.logError("Attempted to load resource at ", path, " but that resource does not exist! Things will break at least a little.");
             return null;
         }
         return ResourceManager.current.loadResource(StorageManager.current, this._type, path);

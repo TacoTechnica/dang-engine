@@ -1,6 +1,6 @@
 import * as BABYLON from 'babylonjs'
 import { autoserializeAs, inheritSerialization } from "cerialize";
-import Logger from "../../logger/Logger";
+import Debug from "../../debug/Debug";
 import { DRSprite } from "../../resource/resources/DRSprite";
 import { ResourceSerializer } from "../../resource/ResourceSerializer";
 import { Game } from "../Game";

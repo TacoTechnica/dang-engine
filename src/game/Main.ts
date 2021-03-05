@@ -1,5 +1,5 @@
 
-import Logger, {PopupType} from '../logger/Logger';
+import Debug, {PopupType} from '../debug/Debug';
 import { Game } from './Game';
 
 import {DropZone} from '../resource/DropZone';
@@ -10,7 +10,7 @@ import { Test } from './Tests';
 
 window.addEventListener('DOMContentLoaded', () => {
 
-    Logger.init("alerts");
+    Debug.init("alerts");
 
     // TODO: Later, this (or maybe an extra resource manager) can check if a project is
     // ALREADY loaded into storage (when we switch to using localStorage, not sessionStorage).
@@ -49,7 +49,7 @@ window.addEventListener('DOMContentLoaded', () => {
             },
             (failMessage) => {
                 // Something failed, we'll have to reload.
-                Logger.popup(failMessage, PopupType.Warning);
+                Debug.popup(failMessage, PopupType.Warning);
             }
         );
     } else {
@@ -65,11 +65,11 @@ window.addEventListener('DOMContentLoaded', () => {
                             game.run();
                         },
                         (failMessage) => {
-                            Logger.popup(failMessage, PopupType.Warning);
+                            Debug.popup(failMessage, PopupType.Warning);
                         }
                     );
                 } else {
-                    Logger.popup(error, PopupType.Warning);
+                    Debug.popup(error, PopupType.Warning);
                 }
             })
         };

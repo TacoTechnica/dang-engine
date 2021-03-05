@@ -11,16 +11,16 @@ export enum PopupType {
  * Controls logging and user notification of the app's status
  * 
  */
-export default class Logger {
+export default class Debug {
     private static _alertBox : HTMLElement;
 
     public static init(alertsElement : string) {
-        Logger._alertBox = document.getElementById(alertsElement) as HTMLCanvasElement;
+        Debug._alertBox = document.getElementById(alertsElement) as HTMLCanvasElement;
     }
 
 
     public static popup(message : string, popupType : PopupType = PopupType.Normal) : void{
-        new Logger.Alert(this._alertBox, message, popupType).popup();
+        new Debug.Alert(this._alertBox, message, popupType).popup();
     }
 
     // Wrappers for now, but now we can add more features to this later.

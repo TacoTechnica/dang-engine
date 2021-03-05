@@ -7,7 +7,7 @@
  * 
  */
 
-import Logger from "../logger/Logger";
+import Debug from "../debug/Debug";
 import { StorageManager } from "./StorageManager";
 
 export class RawResourceManager {
@@ -43,7 +43,7 @@ export class RawResourceManager {
     public createNewRawResource(storageManager : StorageManager, dataBase64 : string, extension : string) : string {
         if (extension.startsWith(".")) extension = extension.substr(1);
         if (!storageManager.directoryExists(RawResourceManager.RAW_PATH)) {
-            Logger.logMessage("Creating new project raw directory");
+            Debug.logMessage("Creating new project raw directory");
             storageManager.createDirectory(RawResourceManager.RAW_PATH);
         }
 
@@ -51,7 +51,7 @@ export class RawResourceManager {
 
         if (storageManager.writeFile(newPath, dataBase64)) {
             this._resourceCounter++;
-            Logger.logError("Failed to create + register new raw resource at ", newPath, ", extension=", extension);
+            Debug.logError("Failed to create + register new raw resource at ", newPath, ", extension=", extension);
             return newPath;
         } else {
             return null;
@@ -71,7 +71,7 @@ export class RawResourceManager {
         if (this.rawResourceExists(storageManager, path)) {
             return storageManager.readFile(path);
         } else {
-            Logger.logError("Invalid raw resource path, does not exist: ", path);
+            Debug.logError("Invalid raw resource path, does not exist: ", path);
             return null;
         }
     }

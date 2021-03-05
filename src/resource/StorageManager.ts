@@ -1,6 +1,6 @@
 
 
-import Logger from '../logger/Logger';
+import Debug from '../debug/Debug';
 import * as JSZip from 'jszip';
 import { files } from 'jszip';
 import { DebugLayer, int } from 'babylonjs';
@@ -44,7 +44,7 @@ export class StorageManager {
                 } else {
                     zippedFile.async("base64").then(data => {
                         if (!this.writeFile(key, data, true)) {
-                            Logger.logError("Failed to write file: ", key);
+                            Debug.logError("Failed to write file: ", key);
                         }
                         if (next()) return;
                     });
@@ -177,7 +177,7 @@ export class StorageManager {
 
         let storageKey = currentDirNode;
         if (!(typeof storageKey === 'string')) {
-            Logger.logError("Failed to grab storage key of path ", path, " this probably means the directory tree is corrupted somehow. Or that I'm a bad programmer.");
+            Debug.logError("Failed to grab storage key of path ", path, " this probably means the directory tree is corrupted somehow. Or that I'm a bad programmer.");
             return false;
         }
 
@@ -200,7 +200,7 @@ export class StorageManager {
             let exists = sub in currentDirNode;
             if (last) {
                 if (exists) {
-                    Logger.logError("Tried creating directory that already exists.");
+                    Debug.logError("Tried creating directory that already exists.");
                     failed = true;
                     return;
                 }
@@ -230,7 +230,7 @@ export class StorageManager {
         path = this.formatPath(path);
         let split : string[] = StorageManager.splitSubpaths(path);
         if (split.length == 0) {
-            Logger.logError("Tried deleting root directory.");
+            Debug.logError("Tried deleting root directory.");
             // We can't delete root directory
             return false;
         }
@@ -239,7 +239,7 @@ export class StorageManager {
         // Delete sub directories?
         if (this.directoryExists(path)) {
             if (this.getPathsInDirectory(path).length != 0 && !recurseDelete) {
-                Logger.logError("Tried deleting non-empty directory without recursive flag set.");
+                Debug.logError("Tried deleting non-empty directory without recursive flag set.");
                 return false;
             }
             // Recursive
@@ -247,7 +247,7 @@ export class StorageManager {
             this.getPathsInDirectory(path).forEach(sub => {
                 if (failed) return;
                 if (!this.deleteItem(sub, true)) {
-                    Logger.logError("Failed to delete sub file that should be deletable: ", sub, ". This likely means a file heirarchy corruption occured.");
+                    Debug.logError("Failed to delete sub file that should be deletable: ", sub, ". This likely means a file heirarchy corruption occured.");
                     failed = true;
                     return;
                 }
@@ -262,7 +262,7 @@ export class StorageManager {
                     this._storage.removeItem(key);
                     directoryTreeModified = true;
                 } else {
-                    Logger.logError("Tried deleting valid file at ", path, "but it's not a file node. This likely means a file heirarchy corruption occured.");
+                    Debug.logError("Tried deleting valid file at ", path, "but it's not a file node. This likely means a file heirarchy corruption occured.");
                     return false;
                 }
             }

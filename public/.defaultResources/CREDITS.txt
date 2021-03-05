@@ -1,0 +1,18 @@
+The following lists credits for all default resources.
+If I fail to correctly give credit for ANY asset let me know so I can fix it right away!  
+
+DIALOGUE BOX:
+DIALOGUE NAMEPLATE:
+    By Thenameszel
+    https://www.deviantart.com/thenameszel/art/Danganronpa-V3-Text-Box-Transparent-757091221
+
+SourceSansPro Font:
+    See OFL.txt in the SourceSansPro folder
+
+OTHER ASSETS:
+    Made by the developer.
+
+    You are free to use any uncredited asset made by the developer.
+    DR Engine projects may use all these assets with NO additional credit (since well, they're included with the package!)
+    If you want to use these assets outside of DR Engine, that's fine too! But in that case drop
+    a credit somewhere or have a link to this project!

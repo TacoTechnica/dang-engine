@@ -6,8 +6,8 @@
 import Logger from "../logger/Logger";
 import { StorageManager } from "./StorageManager";
 
-import * as $ from 'jquery';
 import { autoserialize } from "cerialize";
+import { JsonHelper } from "./JsonHelper";
 
 export class RawPath {
 
@@ -17,31 +17,18 @@ export class RawPath {
         this.path = path;
     }
 
+    public isURL() : boolean {
+        return !this.path.startsWith(".raw/");
+    }
 
-    public readRawBase64(storageManager : StorageManager) : string {
-        if (this.path.startsWith(".raw/")) {
-            return storageManager.readFile(this.path);
+    public getPath() : string {return this.path;}
+
+    public readRawBase64(storageManager : StorageManager, onLoad : (data : string) => void) : void {
+        if (this.isURL()) {
+            // Assume we're reading from the web then.
+            JsonHelper.readFromURL(this.path, data => onLoad(btoa(data)));
+        } else {
+            onLoad(storageManager.readFile(this.path));
         }
-        // Assume we're reading from the web then.
-        let base = this;
-        let error = null;
-        let result = null;
-        $.ajax({
-            url : base.path,
-            success : function(data){
-                result = btoa(data);
-            },
-            error : function(XMLHttpRequest, textStatus, errorThrown) {
-                error = errorThrown;
-            },
-            xhrFields: {
-                withCredentials: true
-            },
-            async: false
-        });
-        if (error != null) {
-            Logger.logError(error);
-        }
-        return result;
     }
 }

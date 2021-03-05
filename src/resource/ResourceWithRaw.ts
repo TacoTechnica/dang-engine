@@ -21,8 +21,7 @@ export abstract class ResourceWithRaw extends Resource {
         }
     }
 
-    public getRawBase64(storageManager : StorageManager) : string {
-        // TODO: Consider caching?
-        return this._resPath.readRawBase64(storageManager);
+    protected getRawPath() : RawPath {
+        return this._resPath;
     }
 }

@@ -4,6 +4,7 @@
  * Caches the resources so we don't have to reload them all the time.
  */
 import { INewable, ISerializable } from "cerialize";
+import Logger from "../logger/Logger";
 import { JsonHelper } from "./JsonHelper";
 import { ProjectInfo } from "./ProjectInfo";
 import { RawResourceManager } from "./RawResourceManager";
@@ -90,6 +91,25 @@ export class ResourceManager {
     public loadProjectFile(storageManager : StorageManager) : ProjectInfo {
         return this.loadResource(storageManager, ProjectInfo, "project.json");
     }
+
+    public loadResourceFromURL<T extends Resource>(storageManager : StorageManager, type: Function | INewable<T> | ISerializable, path : string, onLoad : (resource :T) => void) : void {
+        let key = "#URL//" + path;
+        if (!(key in this._resourceCache)) {
+            JsonHelper.readFromURL(path, data => {
+                data = data;
+                let result = JsonHelper.deserialize(type, data);
+                this._resourceCache[key] = 
+                {
+                    'data': result,
+                    'used': 0
+                };
+                onLoad(result);
+            })
+        } else {
+            onLoad(this._resourceCache[path]);
+        }
+    }
+
 
     private loadNewResourceForce<T extends Resource>(storageManager : StorageManager, type: Function | INewable<T> | ISerializable, path : string) : T {
         if (storageManager.fileExists(path)) {

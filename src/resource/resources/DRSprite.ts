@@ -16,8 +16,12 @@ export class DRSprite extends ResourceWithRaw {
 
     public getPivot() {return this._pivot;}
 
-    public getBase64SpriteUrl(storageManager : StorageManager) {
-        return 'data:image/png;base64,' + this.getRawBase64(storageManager);
+    public getHTMLImageUrl(storageManager : StorageManager, onLoad : (url : string) => void) : void {
+        if (this.getRawPath().isURL()) {
+            onLoad(this.getRawPath().getPath());
+        } else {
+            this.getRawPath().readRawBase64(storageManager, data => onLoad('data:image/png;base64,' + data));
+        }
     }
 
 }

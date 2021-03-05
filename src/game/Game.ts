@@ -1,10 +1,16 @@
 import * as BABYLON from 'babylonjs'
+import { DebugLayer } from 'babylonjs';
+import * as BABYLONGUI from 'babylonjs-gui'
+import { INewable, ISerializable } from 'cerialize';
 import Logger from '../logger/Logger';
+import { DefaultResources } from '../resource/DefaultResources';
 import { ProjectInfo } from '../resource/ProjectInfo';
+import { Resource } from '../resource/Resource';
 import { ResourceManager } from '../resource/ResourceManager';
 import { DRScene } from '../resource/resources/DRScene';
 import { StorageManager } from '../resource/StorageManager';
 import { GameObject, GameObjectCarrier } from './GameObject';
+import { GUIManager } from './GUIManager';
 import { RawInput } from './input/RawInput';
 
 export class Game {
@@ -14,12 +20,15 @@ export class Game {
     // Resource handling
     private _storageManager : StorageManager;
     private _resourceManager : ResourceManager;
+    
+    private _currentProjectInfo : ProjectInfo;
 
     // Scene handling
     private _currentBabylonScene : BABYLON.Scene;
     private _currentDRScene : DRScene;
 
-    private _currentProjectInfo : ProjectInfo;
+    // GUI Managing
+    private _guiManager : GUIManager;
 
     constructor(canvasElement : string, storageManager : StorageManager = null, resourceManager : ResourceManager = null) {
         // Create canvas and engine.
@@ -31,6 +40,8 @@ export class Game {
         this._storageManager = storageManager == null? new StorageManager() : storageManager;
         this._resourceManager = resourceManager == null? new ResourceManager() : resourceManager;
 
+        this._guiManager = new GUIManager();
+
         Logger.logMessage("Game initialized");
     }
 
@@ -38,6 +49,15 @@ export class Game {
     public getCanvas() : HTMLCanvasElement {return this._canvas;}
     public getStorageManager() : StorageManager {return this._storageManager;}
     public getResourceManager() : ResourceManager {return this._resourceManager;}
+
+    public getDefaultResources() : DefaultResources {
+        if (this._currentProjectInfo.defaultResources == null) {
+            Logger.popup("Default resources not found in project.json, will generate an empty set of default resources.");
+            this._currentProjectInfo.defaultResources = new DefaultResources();
+        }
+        return this._currentProjectInfo.defaultResources;
+
+    }
 
     public openProject(onSuccess : () => void, onFail : (message) => void) : void {
         let projectPath = "project.json";
@@ -56,12 +76,13 @@ export class Game {
     }
 
     public loadScene(scene : DRScene) : void {
-        let bscene = new BABYLON.Scene(this.getBabylon());
 
         // Clear previous babylon scene
         if (this._currentBabylonScene != null) {
             this._currentBabylonScene.dispose();
         }
+
+        let bscene = new BABYLON.Scene(this.getBabylon());
 
         scene.onSceneLoad(this, bscene);
 
@@ -70,6 +91,10 @@ export class Game {
         });
 
         this._currentBabylonScene = bscene;
+        // I had to manually set this
+        // to prevent weird bug with GUI.
+        // God dammit that's dumb
+        BABYLON.EngineStore._LastCreatedScene = this._currentBabylonScene;
     }
 
 
@@ -79,12 +104,18 @@ export class Game {
             let startScene : DRScene = this._currentProjectInfo.getStartScene();
             if (startScene != null) {
                 this.loadScene(startScene);
+            } else {
+                Logger.logWarning("No starting scene found.");
             }
+        } else {
+            Logger.logWarning("No project info loaded.");
         }
 
         this._canvas.hidden = false;
         this._canvas.width = window.screen.width;
         this._canvas.height = window.screen.height;
+
+        this._guiManager.initialize(this);
 
         //this._canvas.style.display = 'block';
 

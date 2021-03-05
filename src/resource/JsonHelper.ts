@@ -4,6 +4,8 @@
 
 import { Deserialize, DeserializeInto, INewable, ISerializable, Serialize } from "cerialize";
 import Logger from "../logger/Logger";
+import * as $ from 'jquery';
+
 
 /**
  * interface IThing {}
@@ -43,5 +45,26 @@ export class JsonHelper {
     static deserializeInto<T>(object : T,  type: Function | INewable<T> | ISerializable, jsonText : string) : T{
         let jsonObj = JSON.parse(jsonText);
         return DeserializeInto(jsonObj, type, object);
+    }
+
+    static readFromURLBlocked(url : string, onError : (error : string) => void = null) : string{
+        let result = null;
+        this.readFromURL(url, data => result = data, onError, false);
+        return result;
+    }
+
+    static readFromURL(url : string, onSuccess : (data : string) => void, onError : (error : string) => void = null, async : boolean = true) : void {
+        $.ajax({
+            url : url,
+            success : ((onSuccess != null) ? onSuccess : (data) => {}),
+            error : function(XMLHttpRequest, textStatus, errorThrown) {
+                if (onError != null) onError(errorThrown);
+                else Logger.logError(errorThrown);
+            },
+            xhrFields: {
+                withCredentials: true
+            },
+            async: async
+        });
     }
 }

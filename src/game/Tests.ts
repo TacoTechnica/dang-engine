@@ -1,5 +1,4 @@
-import { Coroutine } from "./coroutines/Coroutine";
-import { CoroutineRunner } from "./coroutines/CoroutineRunner";
+
 import { Game } from "./Game";
 
 /**
@@ -9,35 +8,7 @@ import { Game } from "./Game";
  * at examples of how to do crap.
  */
 export class Test {
-
-    private *inner() {
-        console.log("    INNER: a");
-        yield null;
-        console.log("    INNER: b");
-        yield null;
-    }
-
-    private *outer() {
-        console.log("A");
-        yield null;
-        console.log("B");
-        yield this.inner();
-        console.log("C");
-        yield null;
-    }
-
     public GLOBAL_TEST(game : Game) : void{
 
-        let runner : CoroutineRunner = new CoroutineRunner();
-
-        let routine : Coroutine = runner.run(this.outer());
-
-        let counter = 0;
-        console.log("running coroutine test...");
-        while (routine.isRunning()) {
-            console.log("iter ", counter++);
-            routine.tick();
-        }
-        console.log("done");
     }
 }

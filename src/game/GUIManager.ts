@@ -3,6 +3,7 @@ import * as BABYLONGUI from 'babylonjs-gui'
 import { IDialogueBox } from './gui/IDialogueBox';
 import { DialogueBox } from './gui/DialogueBox';
 import { Game } from './Game';
+import { Container } from 'babylonjs-gui';
 
 
 export class GUIManager {
@@ -15,12 +16,30 @@ export class GUIManager {
             "UI"
         );
         this._advancedTexture.idealWidth = 1920;
+
         this.dialogueBox = new DialogueBox(game, this);
+
+        // BUG FIX: Force a resize for some rendering to not break.
+        game.getBabylon().resize();
     }
 
     public addControl(control: BABYLONGUI.Control) {
         this._advancedTexture.addControl(control);
         return control;
+    }
+
+    public getDynamicTexture() : BABYLONGUI.AdvancedDynamicTexture {return this._advancedTexture;}
+
+    public tickElements() {
+        function branchTick(node : BABYLONGUI.Control) {
+            if (typeof node["tick"] === 'function') {
+                node["tick"]();
+            }
+            if (node instanceof Container) {
+                node.children.forEach(sub => branchTick(sub));
+            }
+        }
+        this._advancedTexture.getChildren().forEach(branchTick);
     }
 
 }

@@ -49,6 +49,7 @@ export class Game {
     public getCanvas() : HTMLCanvasElement {return this._canvas;}
     public getStorageManager() : StorageManager {return this._storageManager;}
     public getResourceManager() : ResourceManager {return this._resourceManager;}
+    public getGUIManager() : GUIManager {return this._guiManager;}
 
     public getDefaultResources() : DefaultResources {
         if (this._currentProjectInfo.defaultResources == null) {

@@ -7,6 +7,7 @@ import { Game } from "../Game";
 import { GUIManager } from "./GUIManager";
 import { DocTextBox } from './DocTextBox';
 import { IDialogueBox } from "./IDialogueBox";
+import { RawInput } from '../input/RawInput';
 
 
 
@@ -47,6 +48,9 @@ export class DialogueBox implements IDialogueBox {
         });
 
         this._outerBox.isVisible = false;
+        this._textBox.isVisible = false;
+
+        game.getVNRunner().onStopRunning.addListener(() => {this.close()});
     }
 
     public *runDialogue(name: string, text: string): IterableIterator<any> {
@@ -54,6 +58,8 @@ export class DialogueBox implements IDialogueBox {
         // TODO: Animate in
 
         this._outerBox.isVisible = true;
+        this._textBox.isVisible = true;
+        this._textBox.setText("");
         this._textBox.setCharacterDisplayCount(0);
         this._textBox.setText(text);
 
@@ -65,20 +71,29 @@ export class DialogueBox implements IDialogueBox {
         // Increase the render amount
         while (counter < textLength) {
             // TODO: If we find user SKIP input, skip/set counter to max.
-            yield Coroutine.waitSecondsRoutine(0.005);
+            yield Coroutine.waitSecondsRoutine(0.005, () => {
+                if (RawInput.isKeyPressed(' ')) {
+                    counter = textLength;
+                    return true;
+                }
+                return false;
+            });
             counter++;
             this._textBox.setCharacterDisplayCount(counter);
         }
 
         this._textBox.setCharacterDisplayCount(-1);
 
-        // TODO: Delete following lines
+        // TODO: "Next" Arrow
         // TODO: Wait for user NEXT input
 
-        yield Coroutine.waitSecondsRoutine(0.75);
+        yield Coroutine.waitUntilRoutine(() => {
+            return RawInput.isKeyPressed(' ');
+        })
     }
     public close(): void {
         // TODO: Animate out
         this._outerBox.isVisible = false;
+        this._textBox.isVisible = false;
     }
 }

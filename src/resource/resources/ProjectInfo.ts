@@ -4,6 +4,7 @@ import { Resource } from '../Resource';
 import { DRScene } from './DRScene';
 import { ResourceSerializer } from '../ResourceSerializer';
 import { StorageManager } from "../StorageManager";
+import { VNScript } from './VNScript';
 
 
 @inheritSerialization(Resource)
@@ -12,7 +13,7 @@ export class ProjectInfo extends Resource {
     @autoserialize public name : string = "Example Project";
     @autoserialize public author : string = "You!";
     @autoserializeAs("uniqueId") private _uniqueId : string = null;
-    @autoserializeAs(new ResourceSerializer(DRScene)) public startingScene : DRScene;
+    @autoserializeAs(new ResourceSerializer(VNScript)) public startingScript : VNScript;
     @autoserializeAs(DefaultResources) public defaultResources : DefaultResources;
 
     constructor(path : string) {
@@ -22,6 +23,6 @@ export class ProjectInfo extends Resource {
         }
     }
 
-    public getStartScene() : DRScene {return this.startingScene;}
+    public getStartingScript() : VNScript {return this.startingScript;}
     public getUniqueId() : string {return this._uniqueId;}
 }

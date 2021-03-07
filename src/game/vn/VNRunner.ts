@@ -22,6 +22,7 @@ import Debug, { PopupType } from "../../debug/Debug";
 import { Coroutine } from "../coroutines/Coroutine";
 import { ResourceManager } from "../../resource/ResourceManager";
 import { StorageManager } from "../../resource/StorageManager";
+import { Action } from "../../util/Action";
 
 
 class StackFrame {
@@ -31,6 +32,8 @@ class StackFrame {
 }
 
 export class VNRunner {
+
+    public onStopRunning : Action = new Action();
 
     // Stack of {script_path, command_index} objects
     @autoserializeAs(StackFrame) private _serializeStack : Array<StackFrame> = [];
@@ -70,6 +73,9 @@ export class VNRunner {
     }
 
     public stop() {
+        if (this._running) {
+            this.onStopRunning.invoke();
+        }
         this._running = false;
         this._liveStack = [];
         this._serializeStack = [];
@@ -109,7 +115,6 @@ export class VNRunner {
     }
 
     public static OnDeserialized(instance : VNRunner, json : any) : void {
-        Debug.logDebug("deserializing VNRunner");
         // After we deserialize, fill up our live stack
         instance._liveStack = [];
         instance._serializeStack.forEach((stackFrame : StackFrame) => {

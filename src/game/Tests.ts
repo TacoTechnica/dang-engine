@@ -21,37 +21,6 @@ export class Test {
 
     public GLOBAL_TEST(game : Game) : void{
 
-        let freshRun = true;
-
-        game.onGameStart.addListener(e => {
-            if (freshRun) {
-                let game : Game = e.detail;
-                let path = "Scripts/TEST_SIMPLE.vn";
-
-                if (game.getResourceManager().resourceExists(game.getStorageManager(), path)) {
-
-                    /*
-                    let script : VNScript = game.getResourceManager().loadResource(game.getStorageManager(), VNScript, path);
-                    while (script.getCommands().length > 0) script.getCommands().pop();
-                    let test = new DialogueCommand();
-                    test.name = "name";
-                    test.text = "I think an <b>Oh Yeah</b> is reconned <i>right about</i> now.";
-
-                    // Remove return + extra command at end
-                    script.getCommands().push(test);
-                    script.getCommands().push(test);
-                    script.getCommands().push(test);
-                    script.getCommands().push(test);
-                    game.getResourceManager().saveResource(game.getStorageManager(), script, path);
-                    */
-
-
-                    Debug.logMessage("Running Simple VN Script System Test");
-                    game.getVNRunner().callScript(game, path);
-                }
-            }
-        });
-
         game.onGameTick.addListener(e => {
             if (RawInput.isKeyPressed('p')) {
                 Debug.logDebug("SAVING");
@@ -60,12 +29,10 @@ export class Test {
             } else if (RawInput.isKeyPressed('l')) {
                 Debug.logDebug("LOADING");
                 game.getSaveFileManager().promptForLoad(data => {
-                    Debug.logDebug("Running from save.");
-                    freshRun = false;
+                    Debug.logDebug("(Running from save.)");
                     game.run(data);
                 });
             }
         });
-
     }
 }

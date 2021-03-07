@@ -5,6 +5,7 @@ import { CallCommand } from "./commands/CallCommand";
 import { DialogueCommand } from "./commands/DialogueCommand";
 import { LabelCommand } from "./commands/LabelCommand";
 import { ReturnCommand } from "./commands/ReturnCommand";
+import { SceneCommand } from "./commands/SceneCommand";
 
 export class GlobalVNCommandRegistry extends AbstractTypeRegistry {
 
@@ -27,4 +28,5 @@ export class GlobalVNCommandRegistry extends AbstractTypeRegistry {
     public static LABEL = GlobalVNCommandRegistry.register(LabelCommand, "Label");
     public static CALL = GlobalVNCommandRegistry.register(CallCommand, "Call");
     public static RETURN = GlobalVNCommandRegistry.register(ReturnCommand, "Return");
+    public static SCENE = GlobalVNCommandRegistry.register(SceneCommand, "Scene");
 }

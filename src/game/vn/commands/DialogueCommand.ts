@@ -1,6 +1,4 @@
 import { autoserialize, autoserializeAs, inheritSerialization } from "cerialize";
-import * as xss from "xss";
-import Debug from "../../../debug/Debug";
 import { TextXSS } from "../../../util/TextXSS";
 import { Game } from "../../Game";
 import { GlobalVNCommandRegistry } from "../GlobalVNCommandRegistry";

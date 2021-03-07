@@ -11,7 +11,7 @@ export class GUIManager {
 
     public dialogueBox : IDialogueBox;
 
-    public initialize(game : Game) {
+    public initializeOnBabylonScene(game : Game) {
         //if (this._advancedTexture == null) {
             this._advancedTexture = BABYLONGUI.AdvancedDynamicTexture.CreateFullscreenUI(
                 "UI"

@@ -92,30 +92,34 @@ export class DocTextBox extends BABYLONGUI.Container {
         if (this._characterDisplayCount == -1) {
             this._node.innerHTML = this._text;
         } else {
-            let cropPoint = DocTextBox.calculateHTMLLengthFromTextLength(this._text, this._characterDisplayCount);
-            let pre = this._text.substr(0, cropPoint);
-            let post = this._text.substr(cropPoint);
-            let hideSpanStart = '<span style="color: rgba(0,0,0,0);">';
-            let hideSpanEnd = '</span>';
+            if (this._characterDisplayCount == 0) {
+                this._node.innerHTML = "";
+            } else {
+                let cropPoint = DocTextBox.calculateHTMLLengthFromTextLength(this._text, this._characterDisplayCount);
+                let pre = this._text.substr(0, cropPoint);
+                let post = this._text.substr(cropPoint);
+                let hideSpanStart = '<span style="color: rgba(0,0,0,0);">';
+                let hideSpanEnd = '</span>';
 
-            // Add this hide span everywhere beyond a point to make sure it's hidden.
-            let postSpanned = "";
-            let hideSpanCount = 1;
-            for (let i = 0; i < post.length; ++i) {
-                let c = post.charAt(i);
-                postSpanned += c;
-                if (c == '>') {
-                    // Add this hide span just to make sure everything after is hidden.
-                    postSpanned += hideSpanStart;
-                    hideSpanCount++;
+                // Add this hide span everywhere beyond a point to make sure it's hidden.
+                let postSpanned = "";
+                let hideSpanCount = 1;
+                for (let i = 0; i < post.length; ++i) {
+                    let c = post.charAt(i);
+                    postSpanned += c;
+                    if (c == '>') {
+                        // Add this hide span just to make sure everything after is hidden.
+                        postSpanned += hideSpanStart;
+                        hideSpanCount++;
+                    }
                 }
-            }
-            
-            for (let i = 0; i < hideSpanCount; ++i) {
-                postSpanned += hideSpanEnd;
-            }
+                
+                for (let i = 0; i < hideSpanCount; ++i) {
+                    postSpanned += hideSpanEnd;
+                }
 
-            this._node.innerHTML = pre + hideSpanStart + postSpanned;
+                this._node.innerHTML = pre + hideSpanStart + postSpanned;
+            }
         }
     }
 
@@ -148,6 +152,11 @@ export class DocTextBox extends BABYLONGUI.Container {
     dispose() : void {
         super.dispose();
         document.body.removeChild(this._node);
+    }
+
+    set isVisible(visible : boolean) {
+        super.isVisible = visible;
+        this._node.style.visibility = visible ? "visible" : "hidden";
     }
 
 }

@@ -15,6 +15,7 @@ import { Action } from '../util/Action';
 import { ResourceSerializer } from '../resource/ResourceSerializer';
 import { JsonHelper } from '../resource/JsonHelper';
 import { SaveFileManager } from '../resource/SaveFileManager';
+import { VNScript } from '../resource/resources/VNScript';
 
 export class Game {
 
@@ -83,6 +84,8 @@ export class Game {
     public getGUIManager() : GUIManager {return this._guiManager;}
     public getVNRunner() : VNRunner {return this._vnRunner;}
 
+    public getCurrentDRScene() : DRScene {return this._currentDRScene;}
+
     public getDefaultResources() : DefaultResources {
         if (this._currentProjectInfo.defaultResources == null) {
             Debug.popup("Default resources not found in project.json, will generate an empty set of default resources.");
@@ -96,13 +99,13 @@ export class Game {
         let projectPath = "project.json";
         if (this._resourceManager.projectFileExists(this._storageManager)) {
             let project : ProjectInfo = this._resourceManager.loadProjectFile(this._storageManager);
-            let startScene : DRScene = project.getStartScene();
-            if (startScene != null) {
+            let startScript : VNScript = project.getStartingScript();
+            if (startScript != null) {
                 this._currentProjectInfo = project;
                 this.onProjectLoad.invoke();
                 onSuccess();
             } else {
-                onFail("A start scene was not defined in " + projectPath + ", this is required.");
+                onFail("A start script was not defined in the project.json file at" + projectPath + ", this is required.");
             }
         } else {
             onFail("No " + projectPath + " file found in your project's root directory. Thus, no project was found.");
@@ -131,10 +134,14 @@ export class Game {
         // to prevent weird bug with GUI.
         // God dammit that's dumb
         BABYLON.EngineStore._LastCreatedScene = this._currentBabylonScene;
+
+        this._guiManager.initializeOnBabylonScene(this);
     }
 
 
     public run(saveStateData : string = null) : void {
+
+        this.getVNRunner().stop();
 
         if (saveStateData != null) {
             // Load our save
@@ -157,11 +164,13 @@ export class Game {
             // Load project starting scene
             // TODO: Replace with starting script later.
             if (this._currentProjectInfo != null) {
-                let startScene : DRScene = this._currentProjectInfo.getStartScene();
-                if (startScene != null) {
-                    this.loadScene(startScene);
+                let startScript : VNScript = this._currentProjectInfo.getStartingScript();
+                if (startScript != null) {
+                    Debug.logMessage("Running starting script")
+                    this.getVNRunner().callScript(this, startScript.getPath());
+                    //this.loadScene(startScene);
                 } else {
-                    Debug.logWarning("No starting scene found.");
+                    Debug.logWarning("No starting script found.");
                 }
             } else {
                 Debug.logWarning("No project info loaded.");
@@ -171,8 +180,6 @@ export class Game {
         this._canvas.hidden = false;
         this._canvas.width = window.screen.width;
         this._canvas.height = window.screen.height;
-
-        this._guiManager.initialize(this);
 
         this.onGameStart.invoke(this);
 

@@ -9,9 +9,9 @@ export class Coroutine {
         this._generator = this.recursiveIterate(generator);
     }
 
-    public static *waitSecondsRoutine(seconds : number) {
+    public static *waitSecondsRoutine(seconds : number, otherBreakCondition : () => boolean = () => false) {
         let now = Date.now() / 1000.0;
-        while ((Date.now() / 1000.0 - now) < seconds) {
+        while ((Date.now() / 1000.0 - now) < seconds && !otherBreakCondition()) {
             yield null;
         }
     }

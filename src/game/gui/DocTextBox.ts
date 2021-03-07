@@ -59,6 +59,11 @@ export class DocTextBox extends BABYLONGUI.Container {
                 insideBracketCount++;
             }
             if (insideBracketCount <= 0) {
+                let escapeSize = this.getLengthOfThisHTMLEscapeCode(htmlText, i);
+                if (escapeSize != -1) {
+                    // escapeSize = innerEscapeCode Thing
+                    i += escapeSize + 1;
+                }
                 counter ++;
             }
             if (c == '>') {
@@ -77,6 +82,11 @@ export class DocTextBox extends BABYLONGUI.Container {
             }
             if (insideBracketCount <= 0) {
                 desiredTextLength--;
+                let escapeSize = this.getLengthOfThisHTMLEscapeCode(htmlText, i);
+                if (escapeSize != -1) {
+                    // escapeSize = innerEscapeCode Thing
+                    i += escapeSize + 1;
+                }
                 if (desiredTextLength == 0) {
                     return i;
                 }
@@ -86,6 +96,27 @@ export class DocTextBox extends BABYLONGUI.Container {
             }
         }
         return htmlText.length;
+    }
+
+    private static getLengthOfThisHTMLEscapeCode(htmlText : string, escapeStart : number) : number {
+        let maxEscape = 6;
+        if (htmlText.charAt(escapeStart) != '&') return -1;
+        let inner = "";
+        let closed = false;
+        for (let i = 0; i < maxEscape; ++i) {
+            let index = escapeStart + i + 1;
+            if (index >= htmlText.length) break;
+            let c = htmlText.charAt(index);
+            if (c == ';') {
+                closed = true;
+                break;
+            }
+            inner += c;
+        }
+        if (!closed) {
+            return -1;
+        }
+        return inner.length;
     }
 
     private generateTextHTML() {

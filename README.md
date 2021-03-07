@@ -1,6 +1,6 @@
 # Dang Engine
 
-Make 3D Murder Mystery Visual novel games in the web.
+Make 3D Murder Mystery Visual Novel games in the web.
 
 This is a typescript project that uses Babylon for 3D rendering.
 

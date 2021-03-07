@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs'
-import { DebugLayer } from 'babylonjs';
+
 import * as BABYLONGUI from 'babylonjs-gui'
 import { INewable, ISerializable } from 'cerialize';
 import Debug from '../debug/Debug';
@@ -13,8 +13,14 @@ import { GameObject, GameObjectCarrier } from './GameObject';
 import { GUIManager } from './GUIManager';
 import { RawInput } from './input/RawInput';
 import { VNRunner } from './vn/VNRunner';
+import { Action } from '../util/Action';
 
 export class Game {
+
+    // Public events/hookups
+    public onGameStart : Action = new Action();
+    public onProjectLoad : Action = new Action();
+
     private _canvas: HTMLCanvasElement;
     private _engine: BABYLON.Engine;
 
@@ -74,6 +80,7 @@ export class Game {
             let startScene : DRScene = project.getStartScene();
             if (startScene != null) {
                 this._currentProjectInfo = project;
+                this.onProjectLoad.invoke();
                 onSuccess();
             } else {
                 onFail("A start scene was not defined in " + projectPath + ", this is required.");
@@ -124,6 +131,8 @@ export class Game {
         this._canvas.height = window.screen.height;
 
         this._guiManager.initialize(this);
+
+        this.onGameStart.invoke(this);
 
         //this._canvas.style.display = 'block';
 

@@ -1,4 +1,5 @@
 
+import { GamepadManager } from "babylonjs";
 import Debug from "../debug/Debug";
 import { VNScript } from "../resource/resources/VNScript";
 import { CoroutineRunner } from "./coroutines/CoroutineRunner";
@@ -15,69 +16,25 @@ import { ReturnCommand } from "./vn/commands/ReturnCommand";
  * at examples of how to do crap.
  */
 export class Test {
-    
+
+    private test(e) : void {
+        Debug.logMessage("UH OH THIS SHOULD NOT RUN");
+    }
+
     public GLOBAL_TEST(game : Game) : void{
 
+        game.onGameStart.addListener(this.test);
 
-        window.setTimeout(() => {
-
-            Debug.logMessage("Creating VN script...")
-
+        game.onGameStart.addListener(e => {
+            let game = e.detail;
             let path = "Scripts/TEST_SIMPLE.vn";
-
-            let testScript : VNScript = new VNScript(path);
-            
-            function dialogue(text) {
-                let r = new DialogueCommand();
-                r.name = "Name";
-                r.text = text;
-                testScript.getCommands().push(r);
-            }
-            function label(label) {
-                let r = new LabelCommand();
-                r.name = label;
-                testScript.getCommands().push(r);
-            }
-            function call(label) {
-                let r = new CallCommand();
-                r.labelTarget = label;
-                testScript.getCommands().push(r);
-            }
-            function ret() {
-                testScript.getCommands().push(new ReturnCommand());
-            }
-
-            // Build the script
-
-            dialogue("A");
-            dialogue("B");
-            call("function");
-            dialogue("F");
-            ret();
-            dialogue("2) Should never happen");
-            label("function");
-                dialogue("C");
-                call("otherFunction");
-                dialogue("E");
-                ret();
-            label("otherFunction");
-                dialogue("D");
-                ret();
-            dialogue("1) Should never happen");
-
             Debug.logMessage("Running Simple VN Script System Test");
 
-            if (!game.getStorageManager().directoryExists("Scripts")) {
-                game.getStorageManager().createDirectory("Scripts");
-            }
-
-            if (game.getResourceManager().saveResource(game.getStorageManager(), testScript, path)) {
+            if (game.getResourceManager().resourceExists(game.getStorageManager(), path)) {
                 game.getVNRunner().callScript(game, path);
-
-                game.getStorageManager().saveZipFile();
-            } else {
-                Debug.logError("Failed to save resource at ", path);
             }
-        }, 5000);
+        });
+
+        game.onGameStart.removeListener(this.test);
     }
 }

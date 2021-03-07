@@ -1,11 +1,12 @@
 import * as BABYLON from 'babylonjs'
 import { autoserializeAs, serializeAs } from 'cerialize';
+import { ITypeSerializable } from '../resource/typeSerialization/ITypeSerializable';
 import { Coroutine } from './coroutines/Coroutine';
 import { CoroutineRunner } from './coroutines/CoroutineRunner';
 import { Game } from "./Game";
 
 // Pure data, our gameobject.
-export abstract class GameObject {
+export abstract class GameObject implements ITypeSerializable {
 
     @autoserializeAs("@type")
     private _type : string;

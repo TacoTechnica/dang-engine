@@ -1,10 +1,8 @@
 
 
-import Debug from '../debug/Debug';
+import Debug, { PopupType } from '../debug/Debug';
 import * as JSZip from 'jszip';
 import { files } from 'jszip';
-import { DebugLayer, int } from 'babylonjs';
-
 import * as FileSaver from 'file-saver'
 
 /**
@@ -23,7 +21,7 @@ export class StorageManager {
     // In memory, bookkeeping that's only used by the editor.
     private _directoryMap = {};
 
-    private _itemCounter : int = 0;
+    private _itemCounter : number = 0;
 
     public static current : StorageManager;
 
@@ -74,7 +72,28 @@ export class StorageManager {
             return false;
         } else {
             this._directoryMap = JSON.parse(data);
+
+            // Check for file corruptions/issues
+            if (!this.attemptToFixAnyBrokenDirectories(corruption => Debug.popup("Tried reading existind project but directory map was corrupted: " + corruption + ". Please load a project from a file.", PopupType.Warning))) {
+                this._directoryMap = {};
+                return false;
+            }
+
             StorageManager.current = this;
+            // Generate new key
+            this._itemCounter = 0;
+            let index = 0;
+            while (true) {
+                let currentKey = this._storage.key(index);
+                if (currentKey == null) break;
+                let currentCounter = this.storageKeyToCounter(currentKey);
+                if (currentCounter > this._itemCounter) {
+                    this._itemCounter = currentCounter;
+                }
+                ++index;
+            }
+            // Avoid that last collision.
+            this._itemCounter += 1;
             return true;
         }
     }
@@ -150,7 +169,7 @@ export class StorageManager {
                 if (last) {
                     // We're the file part and we're new.
                     let newKey = this.getNewStorageKey();
-                    //Logger.logDebug("### ", sub, " = ", newKey);
+                    //Debug.logDebug("NEW: ### ", sub, " = ", newKey);
                     currentDirNode[sub] = newKey;
                     directoryTreeModified = true;
                 } else {
@@ -368,8 +387,37 @@ export class StorageManager {
         }
         return this._itemCounter.toString();
     }
+    private storageKeyToCounter(storageKey : string) {
+        return parseInt(storageKey);
+    }
 
     private updateDirectoryMapFile() : void {
         this._storage.setItem(StorageManager.DIRECTORY_MAP_FILE_NAME, JSON.stringify(this._directoryMap));
     }
-}
+
+    /**
+     * @returns true if no issues/any issues were fixed, false if the tree is corrupted and we can't fix it.
+     */
+    private attemptToFixAnyBrokenDirectories(onCorruptionFound : (corruption : string) => void) : boolean {
+        // Check for:
+        // - Multiple directories pointing to the same path. There's nothing we can do there.
+        let keySet = new Set();
+        let failed : boolean = false;
+        function check(node) {
+            if (failed) return;
+            if (typeof(node) == 'string') {
+                if (keySet.has(node)) {
+                    onCorruptionFound("Duplicate file key: " + node + ". This will result in files being wrongfully overwritten, so we can't let this project load.");
+                    failed = true;
+                }
+                keySet.add(node);
+            } else {
+                Object.keys(node).forEach(key => {
+                    let sub = node[key];
+                    check(sub);
+                });
+            }
+        }
+        return !failed;
+    }
+ }

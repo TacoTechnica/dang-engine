@@ -12,6 +12,7 @@ import { StorageManager } from '../resource/StorageManager';
 import { GameObject, GameObjectCarrier } from './GameObject';
 import { GUIManager } from './GUIManager';
 import { RawInput } from './input/RawInput';
+import { VNRunner } from './vn/VNRunner';
 
 export class Game {
     private _canvas: HTMLCanvasElement;
@@ -30,6 +31,9 @@ export class Game {
     // GUI Managing
     private _guiManager : GUIManager;
 
+    // VN Runner
+    private _vnRunner : VNRunner;
+
     constructor(canvasElement : string, storageManager : StorageManager = null, resourceManager : ResourceManager = null) {
         // Create canvas and engine.
         this._canvas = document.getElementById(canvasElement) as HTMLCanvasElement;
@@ -42,6 +46,8 @@ export class Game {
 
         this._guiManager = new GUIManager();
 
+        this._vnRunner = new VNRunner();
+
         Debug.logMessage("Game initialized");
     }
 
@@ -50,6 +56,7 @@ export class Game {
     public getStorageManager() : StorageManager {return this._storageManager;}
     public getResourceManager() : ResourceManager {return this._resourceManager;}
     public getGUIManager() : GUIManager {return this._guiManager;}
+    public getVNRunner() : VNRunner {return this._vnRunner;}
 
     public getDefaultResources() : DefaultResources {
         if (this._currentProjectInfo.defaultResources == null) {
@@ -126,6 +133,8 @@ export class Game {
         this._engine.runRenderLoop(() => {
 
             RawInput.onPreTick();
+
+            this._vnRunner.onTick();
 
             if (this._currentBabylonScene != null) {
                 let now : number = this.currentTimeSeconds();

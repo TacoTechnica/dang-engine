@@ -1,7 +1,12 @@
 
 import Debug from "../debug/Debug";
+import { VNScript } from "../resource/resources/VNScript";
 import { CoroutineRunner } from "./coroutines/CoroutineRunner";
 import { Game } from "./Game";
+import { CallCommand } from "./vn/commands/CallCommand";
+import { DialogueCommand } from "./vn/commands/DialogueCommand";
+import { LabelCommand } from "./vn/commands/LabelCommand";
+import { ReturnCommand } from "./vn/commands/ReturnCommand";
 
 /**
  * I want Main to remain unchanged so we keep it consistent.
@@ -13,20 +18,66 @@ export class Test {
     
     public GLOBAL_TEST(game : Game) : void{
 
-        let coroutineRunner : CoroutineRunner = new CoroutineRunner();
 
-        function loop() {
-            coroutineRunner.onTick();
-        }
+        window.setTimeout(() => {
 
-        function run() {
-            Debug.logMessage("RUNNING!");
-            let testText = 'A train is a form of rail transport consisting of a series of connected vehicles that generally run along a railroad track to transport passengers or cargo. The word "train" comes from the Old French trahiner, derived from the Latin trahere........';
-            coroutineRunner.run(game.getGUIManager().dialogueBox.runDialogue("Name", testText));
+            Debug.logMessage("Creating VN script...")
 
-            window.setInterval(loop, 10);
-        }
+            let path = "Scripts/TEST_SIMPLE.vn";
 
-        window.setTimeout(run, 2000);
+            let testScript : VNScript = new VNScript(path);
+            
+            function dialogue(text) {
+                let r = new DialogueCommand();
+                r.name = "Name";
+                r.text = text;
+                testScript.getCommands().push(r);
+            }
+            function label(label) {
+                let r = new LabelCommand();
+                r.name = label;
+                testScript.getCommands().push(r);
+            }
+            function call(label) {
+                let r = new CallCommand();
+                r.labelTarget = label;
+                testScript.getCommands().push(r);
+            }
+            function ret() {
+                testScript.getCommands().push(new ReturnCommand());
+            }
+
+            // Build the script
+
+            dialogue("A");
+            dialogue("B");
+            call("function");
+            dialogue("F");
+            ret();
+            dialogue("2) Should never happen");
+            label("function");
+                dialogue("C");
+                call("otherFunction");
+                dialogue("E");
+                ret();
+            label("otherFunction");
+                dialogue("D");
+                ret();
+            dialogue("1) Should never happen");
+
+            Debug.logMessage("Running Simple VN Script System Test");
+
+            if (!game.getStorageManager().directoryExists("Scripts")) {
+                game.getStorageManager().createDirectory("Scripts");
+            }
+
+            if (game.getResourceManager().saveResource(game.getStorageManager(), testScript, path)) {
+                game.getVNRunner().callScript(game, path);
+
+                game.getStorageManager().saveZipFile();
+            } else {
+                Debug.logError("Failed to save resource at ", path);
+            }
+        }, 5000);
     }
 }

@@ -1,5 +1,6 @@
 
 import * as BABYLONGUI from 'babylonjs-gui'
+import Debug from '../../debug/Debug';
 import { DRSprite } from "../../resource/resources/DRSprite";
 import { Coroutine } from '../coroutines/Coroutine';
 import { Game } from "../Game";
@@ -58,14 +59,20 @@ export class DialogueBox implements IDialogueBox {
 
         let counter = 0;
 
+        Debug.logMessage("Dialogue: ", text);
+
         // Increase the render amount
         while (counter < text.length) {
-            // TODO: User SKIP input
+            // TODO: If we find user SKIP input, skip/set counter to max.
             yield Coroutine.waitSecondsRoutine(0.005);
             counter++;
             this._textBox.setCharacterDisplayCount(counter);
         }
-        // TODO: User NEXT input
+
+        // TODO: Delete following lines
+        // TODO: Wait for user NEXT input
+
+        yield Coroutine.waitSecondsRoutine(0.75);
     }
     public close(): void {
         // TODO: Animate out

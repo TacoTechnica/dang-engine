@@ -3,8 +3,9 @@
  * This keeps track of font characters as a font sheet of sorts.
  */
 
-import Debug from "../../debug/Debug";
-import { GUIManager } from "../GUIManager";
+import Debug from "../../../debug/Debug";
+import { GUIManager } from "../../GUIManager";
+
 
 class CachedCharacterRegion {
     public left : number;

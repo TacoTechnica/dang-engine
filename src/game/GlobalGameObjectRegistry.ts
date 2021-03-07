@@ -1,5 +1,7 @@
 import { ISerializable } from "cerialize";
 import Debug from "../debug/Debug";
+import { AbstractTypeRegistry } from "../resource/typeSerialization/AbstractTypeRegistry";
+
 import { Billboard } from "./objects/Billboard";
 
 
@@ -8,32 +10,22 @@ import { Billboard } from "./objects/Billboard";
  * So we have a mapping of key => type
  * for serialization/deserialization.
  */
-export class GlobalGameObjectRegistry {
-    
-    // Data
-    private static _map = {};
+export class GlobalGameObjectRegistry extends AbstractTypeRegistry {
 
-    // Registry hard coded in.
-    // If you want though you can hard code this anywhere, make your own custom class that has custom
-    // gameobject types defined. So while I dislike this centralization, it's still open
-    // to modding in the future.
-
-    // REGISTRY ITEMS
-    public static BILLBOARD = GlobalGameObjectRegistry.register(Billboard, "Billboard");
+    public static instance : GlobalGameObjectRegistry = new GlobalGameObjectRegistry();
 
     public static register(type : Function | ISerializable, name : string) {
-        if (name in this._map) {
-            throw new Error("Duplicate object type registration detected: " + name);
-        }
-        this._map[name] = type;
-        return name;
+        return GlobalGameObjectRegistry.instance.register(type, name);
     }
 
     public static keyMapped(name : string) {
-        return name in this._map;
+        return GlobalGameObjectRegistry.instance.keyMapped(name);
     }
 
     public static getTypeMapping(name : string) {
-        return this._map[name];
+        return GlobalGameObjectRegistry.instance.getTypeMapping(name);
     }
+
+    // REGISTRY ITEMS
+    public static BILLBOARD = GlobalGameObjectRegistry.register(Billboard, "Billboard");
 }

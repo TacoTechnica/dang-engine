@@ -1,3 +1,4 @@
+import Debug from "../debug/Debug";
 
 export class DropZone {
 
@@ -15,14 +16,9 @@ export class DropZone {
         this._element.onclick = (mevent) => {
             if (mevent.button == 0) {
                 mevent.preventDefault();
-                // Open up file window
-                let input : HTMLInputElement = document.createElement('input');
-                input.type = 'file';
-                input.click();
-                input.onchange = (e) => {
-                    this.onfileopened((<HTMLInputElement> e.target).files[0]);
-                    input.remove();
-                 }                 
+                DropZone.doFilePrompt(files => {
+                    this.onfileopened(files[0]);
+                });
             }
         }
 
@@ -46,6 +42,16 @@ export class DropZone {
         };
         this._element.ondragover = (devent) => {
             devent.preventDefault();
+        };
+    }
+
+    public static doFilePrompt(onSelect : (filesSelected : FileList) => void) : void {
+        let input : HTMLInputElement = document.createElement('input');
+        input.type = 'file';
+        input.click();
+        input.onchange = (e) => {
+            onSelect((<HTMLInputElement> e.target).files);
+            input.remove();
         };
     }
 

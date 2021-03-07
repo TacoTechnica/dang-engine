@@ -11,7 +11,7 @@ export class LabelCommand extends VNCommand {
     @autoserialize public name : string;
 
     constructor() {
-        super(GlobalVNCommandRegistry.LABEL);
+        super(GlobalVNCommandRegistry.LABEL, false);
     }
 
     public *run(game : Game): IterableIterator<any> {

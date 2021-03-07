@@ -385,9 +385,12 @@ export class StorageManager {
         while (this._itemCounter.toString() == StorageManager.DIRECTORY_MAP_FILE_NAME) {
             this._itemCounter++;
         }
-        return this._itemCounter.toString();
+        return "_STORAGE_" + this._itemCounter.toString();
     }
     private storageKeyToCounter(storageKey : string) {
+        if (storageKey.startsWith("_STORAGE_")) {
+            storageKey = storageKey.substr("_STORAGE_".length);
+        }
         return parseInt(storageKey);
     }
 

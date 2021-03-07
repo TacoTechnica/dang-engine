@@ -106,7 +106,7 @@ export class ResourceManager {
                 onLoad(result);
             })
         } else {
-            onLoad(this._resourceCache[path]);
+            onLoad(this._resourceCache[key].data);
         }
     }
 

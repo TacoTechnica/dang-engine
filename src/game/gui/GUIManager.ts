@@ -12,13 +12,14 @@ export class GUIManager {
     public dialogueBox : IDialogueBox;
 
     public initialize(game : Game) {
-        this._advancedTexture = BABYLONGUI.AdvancedDynamicTexture.CreateFullscreenUI(
-            "UI"
-        );
-        this._advancedTexture.idealWidth = 1920;
+        //if (this._advancedTexture == null) {
+            this._advancedTexture = BABYLONGUI.AdvancedDynamicTexture.CreateFullscreenUI(
+                "UI"
+            );
+            this._advancedTexture.idealWidth = 1920;
 
-        this.dialogueBox = new DialogueBox(game, this);
-
+            this.dialogueBox = new DialogueBox(game, this);
+        //}
         // BUG FIX: Force a resize for some rendering to not break.
         game.getBabylon().resize();
     }

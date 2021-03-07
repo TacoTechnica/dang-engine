@@ -14,28 +14,30 @@
  */
 
 import { VNScript } from "../../resource/resources/VNScript";
-import { autoserializeAs } from "cerialize";
+import { autoserialize, autoserializeAs } from "cerialize";
 import { VNCommand } from "./VNCommand";
 import { Game } from "../Game";
 import { CoroutineRunner } from "../coroutines/CoroutineRunner";
 import Debug, { PopupType } from "../../debug/Debug";
 import { Coroutine } from "../coroutines/Coroutine";
+import { ResourceManager } from "../../resource/ResourceManager";
+import { StorageManager } from "../../resource/StorageManager";
 
 
 class StackFrame {
-    public scriptPath : string;
-    public lineNumber : number;
+    @autoserialize public scriptPath : string;
+    @autoserialize public lineNumber : number;
     constructor(scriptPath : string, lineNumber : number) {this.scriptPath = scriptPath; this.lineNumber = lineNumber;}
 }
 
 export class VNRunner {
 
     // Stack of {script_path, command_index} objects
-    @autoserializeAs(StackFrame) private _serializeStack = [];
+    @autoserializeAs(StackFrame) private _serializeStack : Array<StackFrame> = [];
     // Stack of live generators that are running.
     private _liveStack = [];
 
-    private _running : boolean = false;
+    @autoserializeAs("running") private _running : boolean = false;
 
     // Run a script, adding to the current stack and starting up the coroutine runner if it hasn't been started already.
     public callScript(game : Game, scriptPath : string, commandIndex : number = 0) {
@@ -104,5 +106,24 @@ export class VNRunner {
         this._serializeStack.splice(stackIndex, 1);
         // We're done
         //this._serializeStack.pop();
+    }
+
+    public static OnDeserialized(instance : VNRunner, json : any) : void {
+        Debug.logDebug("deserializing VNRunner");
+        // After we deserialize, fill up our live stack
+        instance._liveStack = [];
+        instance._serializeStack.forEach((stackFrame : StackFrame) => {
+
+            // For commands like "call", we can NOT repeat the command after running it, otherwise
+            // when we finish the call stack we will re-run call and run the same function TWICE!
+            let script : VNScript = ResourceManager.current.loadResource(StorageManager.current, VNScript, stackFrame.scriptPath);
+            let repeat : boolean = script.getCommands()[stackFrame.lineNumber].shouldRepeatOnLoad();
+            let lineToRunFrom = stackFrame.lineNumber;
+            if (!repeat) {
+                lineToRunFrom++;
+            }
+
+            instance._liveStack.push(new Coroutine(instance.runScriptGenerator(Game.current, stackFrame.scriptPath, lineToRunFrom)));
+        });
     }
 }

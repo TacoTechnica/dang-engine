@@ -21,6 +21,14 @@ export default class Debug {
 
     public static popup(message : string, popupType : PopupType = PopupType.Normal) : void{
         new Debug.Alert(this._alertBox, message, popupType).popup();
+        switch (popupType) {
+            case PopupType.Warning:
+                console.warn(message);
+                break;
+            case PopupType.Error:
+                console.error(message);
+                break;
+            }
     }
 
     // Wrappers for now, but now we can add more features to this later.

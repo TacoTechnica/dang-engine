@@ -9,7 +9,7 @@ import { VNCommand } from "../VNCommand";
 export class ReturnCommand extends VNCommand {
 
     constructor() {
-        super(GlobalVNCommandRegistry.RETURN);
+        super(GlobalVNCommandRegistry.RETURN, true);
     }
 
     public *run(game : Game): IterableIterator<any> {

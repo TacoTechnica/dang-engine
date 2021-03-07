@@ -2,8 +2,10 @@
 import { GamepadManager } from "babylonjs";
 import Debug from "../debug/Debug";
 import { VNScript } from "../resource/resources/VNScript";
+import { SaveFileManager } from "../resource/SaveFileManager";
 import { CoroutineRunner } from "./coroutines/CoroutineRunner";
 import { Game } from "./Game";
+import { RawInput } from "./input/RawInput";
 import { CallCommand } from "./vn/commands/CallCommand";
 import { DialogueCommand } from "./vn/commands/DialogueCommand";
 import { LabelCommand } from "./vn/commands/LabelCommand";
@@ -17,24 +19,53 @@ import { ReturnCommand } from "./vn/commands/ReturnCommand";
  */
 export class Test {
 
-    private test(e) : void {
-        Debug.logMessage("UH OH THIS SHOULD NOT RUN");
-    }
-
     public GLOBAL_TEST(game : Game) : void{
 
-        game.onGameStart.addListener(this.test);
+        let freshRun = true;
 
         game.onGameStart.addListener(e => {
-            let game = e.detail;
-            let path = "Scripts/TEST_SIMPLE.vn";
-            Debug.logMessage("Running Simple VN Script System Test");
+            if (freshRun) {
+                let game : Game = e.detail;
+                let path = "Scripts/TEST_SIMPLE.vn";
 
-            if (game.getResourceManager().resourceExists(game.getStorageManager(), path)) {
-                game.getVNRunner().callScript(game, path);
+                if (game.getResourceManager().resourceExists(game.getStorageManager(), path)) {
+
+                    /*
+                    let script : VNScript = game.getResourceManager().loadResource(game.getStorageManager(), VNScript, path);
+                    while (script.getCommands().length > 0) script.getCommands().pop();
+                    let test = new DialogueCommand();
+                    test.name = "name";
+                    test.text = "I think an <b>Oh Yeah</b> is reconned <i>right about</i> now.";
+
+                    // Remove return + extra command at end
+                    script.getCommands().push(test);
+                    script.getCommands().push(test);
+                    script.getCommands().push(test);
+                    script.getCommands().push(test);
+                    game.getResourceManager().saveResource(game.getStorageManager(), script, path);
+                    */
+
+
+                    Debug.logMessage("Running Simple VN Script System Test");
+                    game.getVNRunner().callScript(game, path);
+                }
             }
         });
 
-        game.onGameStart.removeListener(this.test);
+        game.onGameTick.addListener(e => {
+            if (RawInput.isKeyPressed('p')) {
+                Debug.logDebug("SAVING");
+                let state = game.saveState();
+                game.getSaveFileManager().save(state);
+            } else if (RawInput.isKeyPressed('l')) {
+                Debug.logDebug("LOADING");
+                game.getSaveFileManager().promptForLoad(data => {
+                    Debug.logDebug("Running from save.");
+                    freshRun = false;
+                    game.run(data);
+                });
+            }
+        });
+
     }
 }

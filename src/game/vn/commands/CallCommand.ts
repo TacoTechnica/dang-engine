@@ -12,7 +12,7 @@ export class CallCommand extends VNCommand {
     @autoserialize public labelTarget : string = null;
 
     constructor() {
-        super(GlobalVNCommandRegistry.CALL);
+        super(GlobalVNCommandRegistry.CALL, false);
     }
 
     public *run(game : Game): IterableIterator<any> {
@@ -30,8 +30,6 @@ export class CallCommand extends VNCommand {
         // Call
         game.getVNRunner().callScript(game, script, line);
 
-        // WAIT ONE FRAME to let other script run.
-        yield null;
 
         return;
     }

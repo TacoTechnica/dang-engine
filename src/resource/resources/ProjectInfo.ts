@@ -11,9 +11,17 @@ export class ProjectInfo extends Resource {
 
     @autoserialize public name : string = "Example Project";
     @autoserialize public author : string = "You!";
+    @autoserializeAs("uniqueId") private _uniqueId : string = null;
     @autoserializeAs(new ResourceSerializer(DRScene)) public startingScene : DRScene;
     @autoserializeAs(DefaultResources) public defaultResources : DefaultResources;
 
-    public getStartScene() : DRScene {return this.startingScene;}
+    constructor(path : string) {
+        super(path);
+        if (this._uniqueId == null) {
+            this._uniqueId = Math.random().toString(32).substr(2, 23);
+        }
+    }
 
+    public getStartScene() : DRScene {return this.startingScene;}
+    public getUniqueId() : string {return this._uniqueId;}
 }

@@ -37,7 +37,7 @@ export class DialogueBox implements IDialogueBox {
         //this._textBox.textHorizontalAlignment = BABYLONGUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
         //this._textBox.textVerticalAlignment = BABYLONGUI.Control.VERTICAL_ALIGNMENT_TOP;
         gui.addControl(this._outerBox);
-        game.getDefaultResources().loadDefaultResource(game.getStorageManager(), game.getResourceManager(), DRSprite, game.getDefaultResources().dialogueBox, sprite => {
+        game.getDefaultResources().loadDefaultResource(game.getStorageManager(), game.getResourceManager(), DRSprite, game.getDefaultResources().dialogueBox, (sprite : DRSprite) => {
             sprite.getHTMLImageUrl(game.getStorageManager(), url => {
                 // Outer Box/BG
                 let background = new BABYLONGUI.Image("background",url);
@@ -61,13 +61,16 @@ export class DialogueBox implements IDialogueBox {
 
         Debug.logMessage("Dialogue: ", text);
 
+        let textLength = this._textBox.calculateTextLength();
         // Increase the render amount
-        while (counter < text.length) {
+        while (counter < textLength) {
             // TODO: If we find user SKIP input, skip/set counter to max.
             yield Coroutine.waitSecondsRoutine(0.005);
             counter++;
             this._textBox.setCharacterDisplayCount(counter);
         }
+
+        this._textBox.setCharacterDisplayCount(-1);
 
         // TODO: Delete following lines
         // TODO: Wait for user NEXT input

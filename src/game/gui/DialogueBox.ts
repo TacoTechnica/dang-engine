@@ -4,7 +4,7 @@ import Debug from '../../debug/Debug';
 import { DRSprite } from "../../resource/resources/DRSprite";
 import { Coroutine } from '../coroutines/Coroutine';
 import { Game } from "../Game";
-import { GUIManager } from "../GUIManager";
+import { GUIManager } from "./GUIManager";
 import { DocTextBox } from './DocTextBox';
 import { IDialogueBox } from "./IDialogueBox";
 

@@ -1,7 +1,7 @@
 
 import * as BABYLON from 'babylonjs'
 import * as BABYLONGUI from 'babylonjs-gui'
-import { GUIManager } from '../GUIManager';
+import { GUIManager } from './GUIManager';
 
 /**
  * A text box that uses HTML to render text

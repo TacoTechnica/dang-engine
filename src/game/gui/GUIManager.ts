@@ -1,8 +1,8 @@
 import * as BABYLON from 'babylonjs'
 import * as BABYLONGUI from 'babylonjs-gui'
-import { IDialogueBox } from './gui/IDialogueBox';
-import { DialogueBox } from './gui/DialogueBox';
-import { Game } from './Game';
+import { IDialogueBox } from './IDialogueBox';
+import { DialogueBox } from './DialogueBox';
+import { Game } from '../Game';
 import { Container } from 'babylonjs-gui';
 
 

@@ -10,7 +10,7 @@ import { ResourceManager } from '../resource/ResourceManager';
 import { DRScene } from '../resource/resources/DRScene';
 import { StorageManager } from '../resource/StorageManager';
 import { GameObject, GameObjectCarrier } from './GameObject';
-import { GUIManager } from './GUIManager';
+import { GUIManager } from './gui/GUIManager';
 import { RawInput } from './input/RawInput';
 import { VNRunner } from './vn/VNRunner';
 import { Action } from '../util/Action';

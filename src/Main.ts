@@ -8,6 +8,11 @@ import { StorageManager } from './resource/StorageManager';
 import { ResourceManager } from './resource/ResourceManager';
 import { Test } from './game/Tests';
 
+import { Editor } from './editor/Editor';
+import * as ReactDOM from 'react-dom';
+import * as React from 'react';
+
+
 export function GAME_MAIN() {
     window.addEventListener('DOMContentLoaded', () => {
 
@@ -76,5 +81,9 @@ export function GAME_MAIN() {
 }
 
 export function EDITOR_MAIN() {
-    Debug.logMessage("TODO: Implement editor haha");
+    window.addEventListener('DOMContentLoaded', () => {
+        Debug.logDebug("Editor init I think?");
+        let domContainer = document.getElementById("editor_container");
+        ReactDOM.render(React.createElement(Editor), domContainer);
+    });
 }

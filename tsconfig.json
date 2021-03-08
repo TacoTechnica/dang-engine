@@ -3,7 +3,10 @@
         "experimentalDecorators": true,
         "target": "es2017",
         "module": "commonjs",
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+         // For reacc
+         "jsx": "react"//,
+         //"allowSyntheticDefaultImports": true
     },
     "include": [
         "src/**/*"

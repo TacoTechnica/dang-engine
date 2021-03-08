@@ -10,7 +10,7 @@ module.exports = {
     library: 'Main'
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".glsl"],
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".glsl"]
   },
   module: {
     rules: [

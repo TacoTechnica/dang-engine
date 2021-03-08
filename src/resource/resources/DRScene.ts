@@ -39,7 +39,14 @@ export class DRScene extends Resource {
         camera.attachControl(game.getCanvas(), true);
 
         // Create a basic light, aiming 0,1,0 - meaning, to the sky.
-        new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), bscene);
+        let light : BABYLON.HemisphericLight = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(1,1,1), bscene);
+        light.shadowEnabled = true;
+
+        // TODO: Delete the following
+        let box = BABYLON.MeshBuilder.CreateBox("test box", {size : 2}, bscene);
+        box.position = new BABYLON.Vector3(2, 1.5, 2);
+
+        BABYLON.MeshBuilder.CreateGround("ground", {width: 10, height: 10}, bscene);
     }
 
 }

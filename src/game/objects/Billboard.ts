@@ -6,7 +6,7 @@ import { ResourceSerializer } from "../../resource/ResourceSerializer";
 import { Game } from "../Game";
 import { GameObject, GameObjectCarrier } from "../GameObject";
 
-import * as $ from 'jquery';
+
 import { GlobalGameObjectRegistry } from '../GlobalGameObjectRegistry';
 import { JsonHelper } from '../../resource/JsonHelper';
 
@@ -15,35 +15,36 @@ export class Billboard extends GameObject {
 
     @autoserializeAs('standStraight') private _standStraight : boolean = true;
 
-    @autoserializeAs('width') private _width : number;
-    @autoserializeAs('height') private _height : number;
-
     @autoserializeAs(new ResourceSerializer(DRSprite), 'sprite') private _sprite : DRSprite;
 
     private _plane : BABYLON.Mesh;
 
     private _material : BABYLON.ShaderMaterial;
 
-    constructor(position : BABYLON.Vector3, width : number, height : number, sprite : DRSprite, standStraight : boolean = true) {
+    constructor(position : BABYLON.Vector3, sprite : DRSprite, standStraight : boolean = true) {
         super(GlobalGameObjectRegistry.BILLBOARD, position);
-        this._width = width;
-        this._height = height;
         this._sprite = sprite;
         this._standStraight = standStraight;
     }
 
     onInstantiate(game: Game, scene: BABYLON.Scene, root: GameObjectCarrier): void {
-        this._plane = BABYLON.MeshBuilder.CreatePlane("Billboard", {width: this._width, height: this._height}, scene);
-        this._plane.setParent(root);
         let base = this;
         if (this._sprite != null) {
-            this._plane.isVisible = false;
             let toLoad = 2;
             function onOneShaderLoaded() {
                 toLoad--;
                 if (toLoad == 0) {
                     //let material = new BABYLON.StandardMaterial("myMaterial", scene);
-                    base._sprite.getHTMLImageUrl(game.getStorageManager(), imageUrl => {
+                    base._sprite.getHTMLImage(game.getStorageManager(), htmlImg => {
+                        let scale = base._sprite.getActualWorldScale();
+                        let w = htmlImg.width*scale,
+                            h = htmlImg.height*scale;
+                        let pivot = base._sprite.getPivot();
+                        base._plane = Billboard.createPlane(scene, w, h, w*pivot.x, h - h*pivot.y);
+                        base._plane.setParent(root);
+                        // Make the top left the pivot, then offset.
+                        base._plane.position = new BABYLON.Vector3(0, 0, 0);
+
                         base._material = new BABYLON.ShaderMaterial("shader", scene, {
                             vertex: "billboard",
                             fragment: "billboard",
@@ -52,10 +53,14 @@ export class Billboard extends GameObject {
                             attributes: ["position", "normal", "uv"],
                             uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
                         });
-                        base._material.setTexture("textureSampler", new BABYLON.Texture(imageUrl, scene));
+                        base._material.setTexture("textureSampler", new BABYLON.Texture(htmlImg.src, scene));
                         base._material.setInt("cylindrical", base._standStraight? 1 : 0);
                         base._plane.material = base._material;
                         base._plane.isVisible = true;
+
+                        let tempSphere = BABYLON.MeshBuilder.CreateSphere("temp", {diameter: 0.1}, scene);
+                        tempSphere.setParent(root);
+                        tempSphere.position = BABYLON.Vector3.Zero();
                     });
                 }
             }
@@ -82,6 +87,46 @@ export class Billboard extends GameObject {
 
     tick(game: Game, dt: number): void {
         // Do nothing
+    }
+
+    private static createPlane(scene : BABYLON.Scene, width : number, height : number, pivotX : number, pivotY : number) : BABYLON.Mesh {
+        var indices = [];
+        var positions = [];
+        var normals = [];
+        var uvs = [];
+        // Vertices
+
+        positions.push(-pivotX, -pivotY, 0);
+        normals.push(0, 0, -1.0);
+        uvs.push(0.0, 0.0);
+        positions.push(-pivotX + width, -pivotY, 0);
+        normals.push(0, 0, -1.0);
+        uvs.push(1.0, 0.0);
+        positions.push(-pivotX + width, -pivotY + height, 0);
+        normals.push(0, 0, -1.0);
+        uvs.push(1.0, 1.0);
+        positions.push(-pivotX, -pivotY + height, 0);
+        normals.push(0, 0, -1.0);
+        uvs.push(0.0, 1.0);
+        // Indices
+        indices.push(0);
+        indices.push(1);
+        indices.push(2);
+        indices.push(0);
+        indices.push(2);
+        indices.push(3);
+        // Sides
+        // Result
+        var vertexData = new BABYLON.VertexData();
+        vertexData.indices = indices;
+        vertexData.positions = positions;
+        vertexData.normals = normals;
+        vertexData.uvs = uvs;
+
+        let result = new BABYLON.Mesh("billboard plane", scene);
+        vertexData.applyToMesh(result);
+
+        return result;
     }
 
 }

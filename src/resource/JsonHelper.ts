@@ -1,30 +1,8 @@
 
-// Json serialization/deserialization that we might want to swap out with a library later.
-// TODO: Test for the following scenario:
 
 import { Deserialize, DeserializeInto, INewable, ISerializable, Serialize } from "cerialize";
 import Debug from "../debug/Debug";
 import * as $ from 'jquery';
-
-
-/**
- * interface IThing {}
- * class A : IThing {...}
- * class B : IThing {...}
- * 
- * 
- * ...
- * 
- * 
- * IThing[] stuff = [new A(...), new B(...), new B(...), new A(...) ]
- * 
- * string data = serialize(stuff);
- * 
- * IThing[] readFromJson = deserialize(stuff);
- * 
- * `readFromJson` should contain A, B, B, A with the right class type + data.
- * 
- */
 
 export class JsonHelper {
 

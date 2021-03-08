@@ -12,9 +12,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     Debug.init("alerts");
 
-    // TODO: Later, this (or maybe an extra resource manager) can check if a project is
-    // ALREADY loaded into storage (when we switch to using localStorage, not sessionStorage).
-    // If that's the case, then we can skip creating the dropzone and have a popup or something.
     let storageManager : StorageManager = new StorageManager();
     let resourceManager : ResourceManager = new ResourceManager();
 

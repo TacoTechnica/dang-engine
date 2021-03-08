@@ -161,8 +161,7 @@ export class Game {
             // VN System should be loaded.
         } else {
             // New game / no save state selected, start from beginning.
-            // Load project starting scene
-            // TODO: Replace with starting script later.
+            // Load project starting script
             if (this._currentProjectInfo != null) {
                 let startScript : VNScript = this._currentProjectInfo.getStartingScript();
                 if (startScript != null) {

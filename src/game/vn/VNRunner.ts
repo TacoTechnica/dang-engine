@@ -1,17 +1,3 @@
-/**
- * TODO: Check notion.
- * You wanna make this da runner
- * and keep the serialization + running
- * 
- * EL MUY SIMPLE
- * 
- * live Stack + serialization stack
- * 
- * easy deserialization of serialization stack
- * then conversion of deserialized serialization stack => a new Live stack.
- * (this new live stack is NOT identical to the pre-serialized one, and that's OK. it will rerun the last command)
- * 
- */
 
 import { VNScript } from "../../resource/resources/VNScript";
 import { autoserialize, autoserializeAs } from "cerialize";

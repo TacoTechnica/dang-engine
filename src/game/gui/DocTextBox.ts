@@ -1,6 +1,7 @@
 
 import * as BABYLON from 'babylonjs'
 import * as BABYLONGUI from 'babylonjs-gui'
+import Debug from '../../debug/Debug';
 import { GUIManager } from './GUIManager';
 
 /**
@@ -24,7 +25,8 @@ export class DocTextBox extends BABYLONGUI.Container {
         //let canvas = gui.getDynamicTexture().getContext().canvas;
 
         this._node = document.createElement("p");
-        document.body.prepend(this._node);
+        gui.getHTMLOverlayContainer().appendChild(this._node);
+        //document.body.prepend(this._node);
         this._node.onload = evt => {
             this.setNodePos(this.leftInPixels, this.topInPixels, this.widthInPixels, this.heightInPixels);
         }
@@ -155,15 +157,19 @@ export class DocTextBox extends BABYLONGUI.Container {
     }
 
     private setNodePos(x, y, width, height) {
-        let canvasRect = this._gui.getDynamicTexture().getContext().canvas.getBoundingClientRect();
-        x += canvasRect.left;
-        y += canvasRect.top;
+        let canvas = this._gui.getMainCanvas();
+        Debug.logDebug(canvas);
+        let parentOffs = DocTextBox.getScreenCordinates(canvas);
+        x += parentOffs.x;
+        y += parentOffs.y;
+        Debug.logDebug(parentOffs);
         this._node.style.position = "absolute";
         this._node.style.left = x + "px";
         this._node.style.top = y + "px";
         this._node.style.width = width + "px";
         this._node.style.height = height + "px";
         this._node.style.padding = '0 0 0 0';
+        this._node.style.outlineWidth = "1px";
 
         this.updateVisualFontInternal();
     }
@@ -182,12 +188,18 @@ export class DocTextBox extends BABYLONGUI.Container {
 
     dispose() : void {
         super.dispose();
-        document.body.removeChild(this._node);
+        this._gui.getHTMLOverlayContainer().removeChild(this._node);
     }
 
     set isVisible(visible : boolean) {
         super.isVisible = visible;
         this._node.style.visibility = visible ? "visible" : "hidden";
+    }
+
+    private static getScreenCordinates(obj : HTMLElement) : BABYLON.Vector2 {
+        let scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+	    scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        return new BABYLON.Vector2(scrollLeft + obj.offsetLeft, scrollTop + obj.offsetTop);
     }
 
 }

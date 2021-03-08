@@ -11,12 +11,19 @@ export class GUIManager {
 
     public dialogueBox : IDialogueBox;
 
+    private _overlayContainer : HTMLElement;
+
+    private _mainCanvas : HTMLCanvasElement;
+
     public initializeOnBabylonScene(game : Game) {
         //if (this._advancedTexture == null) {
+            this._mainCanvas = game.getCanvas();
             this._advancedTexture = BABYLONGUI.AdvancedDynamicTexture.CreateFullscreenUI(
                 "UI"
             );
             this._advancedTexture.idealWidth = 1920;
+
+            this._overlayContainer = document.getElementById("canvas_wrapper");
 
             this.dialogueBox = new DialogueBox(game, this);
         //}
@@ -30,6 +37,10 @@ export class GUIManager {
     }
 
     public getDynamicTexture() : BABYLONGUI.AdvancedDynamicTexture {return this._advancedTexture;}
+
+    public getHTMLOverlayContainer() : HTMLElement {return this._overlayContainer;}
+
+    public getMainCanvas() : HTMLCanvasElement {return this._mainCanvas;}
 
     public tickElements() {
         function branchTick(node : BABYLONGUI.Control) {

@@ -29,8 +29,8 @@ export class DialogueBox implements IDialogueBox {
         this._textBox = new DocTextBox(gui, "text", 42);//new BABYLONGUI.TextBlock("text", "");
         this._textBox._markAsDirty();
         // TODO: Make padding left + width set via offsets configured as a custom range in the editor.
-        this._textBox.paddingLeft = "248px"
-        this._textBox.paddingTop = "130px"
+        this._textBox.paddingLeft = "234px"
+        this._textBox.paddingTop = "110px"
         this._textBox.width = "1420px";
         this._textBox.color = "white";
         this._textBox.horizontalAlignment = BABYLONGUI.Control.HORIZONTAL_ALIGNMENT_LEFT;

@@ -1,4 +1,7 @@
 
+.canvas_wrapper {
+    position:relative;
+}
 canvas {
     outline: none;
     width: 100%;
